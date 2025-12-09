@@ -33,7 +33,7 @@ function Leftbar() {
 
             <div className="mt-10 px-6">
                 <SignedIn>
-                    <SignOutButton signOutCallback={() => router.push('/sign-in')}>
+                    <SignOutButton redirectUrl="/sign-in">
                         <div className="flex cursor-pointer gap-4 p-4">
                             <LogOut />
                             <p className="text-light-1 max-xs:hidden">Logout</p>
