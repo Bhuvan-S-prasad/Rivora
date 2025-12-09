@@ -1,113 +1,81 @@
 @import "tailwindcss";
 @layer theme, base, clerk, components, utilities;
 
+/* -------------------------------------------------------------- */
+/*  🌈 1. Root Theme Values                                       */
+/* -------------------------------------------------------------- */
+
 :root {
-  --background: oklch(0.9900 0 0);
+  --background: oklch(0.99 0 0);
   --foreground: oklch(0 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0 0 0);
-  --popover: oklch(0.9900 0 0);
+  --popover: oklch(0.99 0 0);
   --popover-foreground: oklch(0 0 0);
   --primary: oklch(0 0 0);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.9400 0 0);
+  --secondary: oklch(0.94 0 0);
   --secondary-foreground: oklch(0 0 0);
-  --muted: oklch(0.9700 0 0);
-  --muted-foreground: oklch(0.4400 0 0);
-  --accent: oklch(0.9400 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.44 0 0);
+  --accent: oklch(0.94 0 0);
   --accent-foreground: oklch(0 0 0);
-  --destructive: oklch(0.6300 0.1900 23.0300);
+  --destructive: oklch(0.63 0.19 23.03);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9200 0 0);
-  --input: oklch(0.9400 0 0);
+  --border: oklch(0.92 0 0);
+  --input: oklch(0.94 0 0);
   --ring: oklch(0 0 0);
-  --chart-1: oklch(0.8100 0.1700 75.3500);
-  --chart-2: oklch(0.5500 0.2200 264.5300);
-  --chart-3: oklch(0.7200 0 0);
-  --chart-4: oklch(0.9200 0 0);
-  --chart-5: oklch(0.5600 0 0);
-  --sidebar: oklch(0.9900 0 0);
+
+  --chart-1: oklch(0.81 0.17 75.35);
+  --chart-2: oklch(0.55 0.22 264.53);
+  --chart-3: oklch(0.72 0 0);
+  --chart-4: oklch(0.92 0 0);
+  --chart-5: oklch(0.56 0 0);
+
+  --sidebar: oklch(0.99 0 0);
   --sidebar-foreground: oklch(0 0 0);
   --sidebar-primary: oklch(0 0 0);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.9400 0 0);
+  --sidebar-accent: oklch(0.94 0 0);
   --sidebar-accent-foreground: oklch(0 0 0);
-  --sidebar-border: oklch(0.9400 0 0);
+  --sidebar-border: oklch(0.94 0 0);
   --sidebar-ring: oklch(0 0 0);
+
   --font-sans: Geist, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Geist Mono, monospace;
+
   --radius: 0.5rem;
-  --shadow-x: 0px;
-  --shadow-y: 1px;
-  --shadow-blur: 2px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.18;
-  --shadow-color: hsl(0 0% 0%);
-  --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
-  --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
-  --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
-  --shadow: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
-  --shadow-md: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 2px 4px -1px hsl(0 0% 0% / 0.18);
-  --shadow-lg: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 4px 6px -1px hsl(0 0% 0% / 0.18);
-  --shadow-xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 8px 10px -1px hsl(0 0% 0% / 0.18);
-  --shadow-2xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.45);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
 }
+
+/* -------------------------------------------------------------- */
+/*  🌙 Dark Mode                                                  */
+/* -------------------------------------------------------------- */
 
 .dark {
   --background: oklch(0 0 0);
   --foreground: oklch(1 0 0);
-  --card: oklch(0.1400 0 0);
+  --card: oklch(0.14 0 0);
   --card-foreground: oklch(1 0 0);
-  --popover: oklch(0.1800 0 0);
+  --popover: oklch(0.18 0 0);
   --popover-foreground: oklch(1 0 0);
   --primary: oklch(1 0 0);
   --primary-foreground: oklch(0 0 0);
-  --secondary: oklch(0.2500 0 0);
+  --secondary: oklch(0.25 0 0);
   --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.2300 0 0);
-  --muted-foreground: oklch(0.7200 0 0);
-  --accent: oklch(0.3200 0 0);
+  --muted: oklch(0.23 0 0);
+  --muted-foreground: oklch(0.72 0 0);
+  --accent: oklch(0.32 0 0);
   --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.6900 0.2000 23.9100);
-  --destructive-foreground: oklch(0 0 0);
-  --border: oklch(0.2600 0 0);
-  --input: oklch(0.3200 0 0);
-  --ring: oklch(0.7200 0 0);
-  --chart-1: oklch(0.8100 0.1700 75.3500);
-  --chart-2: oklch(0.5800 0.2100 260.8400);
-  --chart-3: oklch(0.5600 0 0);
-  --chart-4: oklch(0.4400 0 0);
-  --chart-5: oklch(0.9200 0 0);
-  --sidebar: oklch(0.1800 0 0);
-  --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(1 0 0);
-  --sidebar-primary-foreground: oklch(0 0 0);
-  --sidebar-accent: oklch(0.3200 0 0);
-  --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.3200 0 0);
-  --sidebar-ring: oklch(0.7200 0 0);
-  --font-sans: Geist, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Geist Mono, monospace;
-  --radius: 0.5rem;
-  --shadow-x: 0px;
-  --shadow-y: 1px;
-  --shadow-blur: 2px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0.18;
-  --shadow-color: hsl(0 0% 0%);
-  --shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
-  --shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.09);
-  --shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
-  --shadow: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 1px 2px -1px hsl(0 0% 0% / 0.18);
-  --shadow-md: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 2px 4px -1px hsl(0 0% 0% / 0.18);
-  --shadow-lg: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 4px 6px -1px hsl(0 0% 0% / 0.18);
-  --shadow-xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.18), 0px 8px 10px -1px hsl(0 0% 0% / 0.18);
-  --shadow-2xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.45);
+
+  --border: oklch(0.26 0 0);
+  --input: oklch(0.32 0 0);
+  --ring: oklch(0.72 0 0);
 }
+
+/* -------------------------------------------------------------- */
+/*  🌈 2. Tailwind Semantic Tokens                               */
+/* -------------------------------------------------------------- */
 
 @theme inline {
   --color-background: var(--background);
@@ -129,11 +97,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -145,19 +109,139 @@
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
-  --font-serif: var(--font-serif);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --breakpoint-xs: 30rem;
 
-  --shadow-2xs: var(--shadow-2xs);
-  --shadow-xs: var(--shadow-xs);
-  --shadow-sm: var(--shadow-sm);
-  --shadow: var(--shadow);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-2xl: var(--shadow-2xl);
+  /* ---------------------------------------- */
+  /* 📌 Custom Text Scale (Your old Tailwind) */
+  /* ---------------------------------------- */
+
+  --text-heading1-bold: 36px;
+  --text-heading1-semibold: 36px;
+
+  --text-heading2-bold: 30px;
+  --text-heading2-semibold: 30px;
+
+  --text-heading3-bold: 24px;
+  --text-heading4-medium: 20px;
+
+  --text-body-bold: 18px;
+  --text-body-semibold: 18px;
+  --text-body-medium: 18px;
+  --text-body-normal: 18px;
+
+  --text-base-regular: 16px;
+  --text-base-medium: 16px;
+  --text-base-semibold: 16px;
+
+  --text-small-regular: 14px;
+  --text-small-medium: 14px;
+  --text-small-semibold: 14px;
+
+  --text-subtle-medium: 12px;
+  --text-subtle-semibold: 12px;
+
+  --text-tiny-medium: 10px;
+  --text-x-small-semibold: 7px;
+}
+
+/* -------------------------------------------------------------- */
+/*  🌈 3. Custom Utility Classes                                 */
+/* -------------------------------------------------------------- */
+
+@layer utilities {
+  .text-heading2-bold {
+    font-size: var(--text-heading2-bold);
+    font-weight: 700;
+    line-height: 140%;
+  }
+
+  .text-small-regular {
+    font-size: var(--text-small-regular);
+    font-weight: 400;
+    line-height: 140%;
+  }
+
+  .css-invert {
+    @apply invert-50 brightness-200;
+  }
+}
+
+/* -------------------------------------------------------------- */
+/*  🌈 4. Components                                              */
+/* -------------------------------------------------------------- */
+
+@layer components {
+
+  .main-container {
+    @apply flex min-h-screen flex-1 flex-col items-center bg-background text-foreground px-6 pb-10 pt-28 max-md:pb-32 sm:px-10;
+  }
+
+  .head-text {
+    @apply text-heading2-bold text-foreground;
+  }
+
+  .activity-card {
+    @apply flex items-center gap-2 rounded-md bg-card text-card-foreground px-7 py-4;
+  }
+
+  .no-result {
+    @apply text-center text-muted-foreground;
+  }
+
+  .community-card {
+    @apply w-full rounded-lg bg-card text-card-foreground px-4 py-5 sm:w-96;
+  }
+
+  .community-card_btn {
+    @apply rounded-lg bg-primary text-primary-foreground px-5 py-1.5 text-small-regular;
+  }
+
+  .user-card {
+    @apply flex flex-col justify-between gap-4 bg-card text-card-foreground max-xs:rounded-xl max-xs:p-4 xs:flex-row xs:items-center;
+  }
+
+  .user-card_btn {
+    @apply min-w-[74px] rounded-lg bg-primary text-primary-foreground text-[12px];
+  }
+
+  .searchbar {
+    @apply flex gap-1 rounded-lg bg-muted px-4 py-2;
+  }
+
+  .searchbar_input {
+    @apply bg-muted text-muted-foreground outline-none border-none;
+  }
+
+  .topbar {
+    @apply fixed top-0 z-30 flex w-full items-center justify-between bg-card text-card-foreground px-6 py-3;
+  }
+
+  .bottombar {
+    @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-background/60 backdrop-blur-lg p-4 xs:px-7 md:hidden;
+  }
+
+  .leftsidebar {
+    @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground pb-5 pt-28 max-md:hidden;
+  }
+
+  .leftsidebar_link {
+    @apply flex gap-4 p-4 rounded-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground;
+  }
+
+  .rightsidebar {
+    @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-l border-sidebar-border bg-sidebar text-sidebar-foreground px-10 pb-6 pt-28 max-xl:hidden;
+  }
+
+  .pagination {
+    @apply mt-10 flex w-full items-center justify-center gap-5;
+  }
+
+  .bottombar_container {
+    @apply flex items-center justify-between gap-3 xs:gap-5;
+  }
+
+  .bottombar_link {
+    @apply relative flex flex-col items-center gap-2 rounded-lg p-2 sm:flex-1 sm:px-2 sm:py-2.5;
+  }
 }
