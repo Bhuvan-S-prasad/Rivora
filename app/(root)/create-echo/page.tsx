@@ -14,7 +14,7 @@ async function Page() {
     return (
         <main>
             <h1 className="head-text">Create Echo</h1>
-            <PostEcho userId={userInfo?._id} />
+            <PostEcho userId={userInfo?._id.toString()} userImage={userInfo?.image} name={userInfo?.name} username={userInfo?.username} />
         </main>
     )
 }

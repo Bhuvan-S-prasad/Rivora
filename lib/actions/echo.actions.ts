@@ -9,12 +9,12 @@ interface Params {
     text: string;
     author: string;
     riftId: string | null;
-    image: string | null;
+    images?: string[] | null;
     path: string;
 }
 
 
-export async function createEcho({ text, author, riftId, image, path }: Params) {
+export async function createEcho({ text, author, riftId, images, path }: Params) {
     try {
         connectToDB();
 
@@ -22,7 +22,7 @@ export async function createEcho({ text, author, riftId, image, path }: Params) 
             text,
             author,
             riftId: null,
-            image,
+            images,
         });
 
         await User.findByIdAndUpdate(author, {

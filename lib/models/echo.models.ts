@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import { unique } from "next/dist/build/utils";
-import { Children } from "react";
 
 
 const echoSchema = new mongoose.Schema({
@@ -21,9 +19,11 @@ const echoSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    image: {
-        type: String,
-    },
+    images: [
+        {
+            type: String,
+        }
+    ],
     parentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Echo',

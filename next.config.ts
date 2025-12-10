@@ -20,6 +20,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "placehold.co",
       },
+      {
+        protocol: "https",
+        hostname: "fmh4nd83pe.ufs.sh",
+      },
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+      }
     ]
   }
 };
