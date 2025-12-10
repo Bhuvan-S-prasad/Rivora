@@ -29,7 +29,7 @@ const echoSchema = new mongoose.Schema({
         ref: 'Echo',
     },
 
-    Children: [
+    children: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Echo',

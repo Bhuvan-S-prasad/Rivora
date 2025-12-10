@@ -35,3 +35,33 @@ export async function createEcho({ text, author, riftId, images, path }: Params)
         console.error("Error creating echo:", error);
     }
 }
+
+export async function fetchEchoes(pageNumber = 1, pageSize = 20) {
+    connectToDB();
+
+    const skipAmount = (pageNumber - 1) * pageSize;
+
+    const echoQuery = Echo.find({ parentId: { $in: [null, undefined] } })
+        .sort({ createdAt: 'desc' })
+        .skip(skipAmount)
+        .limit(pageSize)
+        .populate({ path: 'author', model: User })
+        .populate({
+            path: 'children',
+            populate: {
+                path: 'author',
+                model: User,
+                select: "_id name parentId image"
+            }
+        })
+
+    const totalPostsCount = await Echo.countDocuments({ parentId: { $in: [null, undefined] } })
+
+    const echos = await echoQuery.exec();
+
+    const isNext = totalPostsCount > skipAmount + echos.length;
+
+    return { echos, isNext };
+
+
+}

@@ -15,7 +15,7 @@ function Topbar() {
         if (path.includes('/activity')) return 'Activity';
         if (path.includes('/create-echo')) return 'Post';
         if (path.includes('/profile')) return 'Profile';
-        if (path.includes('/communities')) return 'Communities';
+        if (path.includes('/rift')) return 'Rifts';
         return '';
     };
 
