@@ -37,6 +37,7 @@ export default async function Home() {
                   author={echo.author}
                   rift={echo.rift}
                   images={echo.images}
+                  likes={echo.likes ? echo.likes : []}
                   createdAt={echo.createdAt}
                   comments={echo.children}
                 />

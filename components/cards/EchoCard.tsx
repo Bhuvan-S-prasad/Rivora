@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, MessageCircle, Repeat, Share2 } from "lucide-react";
 
 import { formatTimeAgo } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+import { toggleLikeEcho } from "@/lib/actions/echo.actions";
 
 interface Props {
     id: string;
@@ -20,6 +24,7 @@ interface Props {
         image: string;
     } | null
     images: string[] | null;
+    likes: string[];
     createdAt: Date;
     comments: {
         author: {
@@ -38,10 +43,18 @@ const EchoCard = ({
     author,
     rift,
     images,
+    likes,
     createdAt,
     comments,
     isCommented,
 }: Props) => {
+    const pathname = usePathname();
+    const isLiked = likes.includes(currentUserId);
+
+    const handleLike = async () => {
+        await toggleLikeEcho(id, currentUserId, pathname);
+    };
+
     return (
         <article className={`flex w-full flex-col ${isCommented ? 'px-0 xs:px-7' : 'p-7 border-b border-gray-200'}`}>
             <div className="flex items-start justify-between">
@@ -69,7 +82,7 @@ const EchoCard = ({
                         </div>
 
                         <Link href={`/echo/${id}`}>
-                            <p className="mt-2 text-small-regular text-dark-2">
+                            <p className="mt-2 text-small-regular text-dark-2 whitespace-pre-wrap">
                                 {content}
                             </p>
                         </Link>
@@ -101,8 +114,17 @@ const EchoCard = ({
 
                         <div className="mt-5 flex items-center gap-6">
                             {/* Heart */}
-                            <div className="flex gap-2 items-center group cursor-pointer">
-                                <Heart className="w-5 h-5 text-gray-1 group-hover:text-red-500 transition-colors" />
+                            <div onClick={handleLike} className="flex gap-2 items-center group cursor-pointer">
+                                {isLiked ? (
+                                    <Heart className="w-5 h-5 fill-red-500 text-red-500" />
+                                ) : (
+                                    <Heart className="w-5 h-5 text-gray-1 group-hover:text-red-500 transition-colors" />
+                                )}
+                                {likes.length > 0 && (
+                                    <p className={`text-subtle-medium ${isLiked ? 'text-red-500' : 'text-gray-1 group-hover:text-red-500'}`}>
+                                        {likes.length}
+                                    </p>
+                                )}
                             </div>
 
                             {/* Reply */}

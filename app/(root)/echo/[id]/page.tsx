@@ -31,6 +31,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
                     author={echo.author}
                     rift={echo.rift}
                     images={echo.images}
+                    likes={echo.likes ? echo.likes : []}
                     createdAt={echo.createdAt}
                     comments={echo.children}
                 />
@@ -55,6 +56,7 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
                         author={childItem.author}
                         rift={childItem.rift}
                         images={childItem.images}
+                        likes={childItem.likes ? childItem.likes : []}
                         createdAt={childItem.createdAt}
                         comments={childItem.children}
                         isCommented

@@ -57,11 +57,13 @@ export async function fetchEchoes(pageNumber = 1, pageSize = 20) {
 
     const totalPostsCount = await Echo.countDocuments({ parentId: { $in: [null, undefined] } })
 
-    const echos = await echoQuery.exec();
+    const echos = await echoQuery.lean().exec();
+
+    const echosStringified = JSON.parse(JSON.stringify(echos));
 
     const isNext = totalPostsCount > skipAmount + echos.length;
 
-    return { echos, isNext };
+    return { echos: echosStringified, isNext };
 
 
 }
@@ -95,8 +97,9 @@ export async function fetchEchoById(id: string) {
 
                     }
                 ]
-            }).exec();
-        return echo;
+            }).lean().exec();
+
+        return JSON.parse(JSON.stringify(echo));
 
     } catch (error) {
         console.error("Error fetching echo by ID:", error);
@@ -135,5 +138,36 @@ export async function addCommentToEcho(
     } catch (error: any) {
         console.error("Error adding comment to thread:", error);
         throw new Error(`Error adding comment to thread: ${error.message}`);
+    }
+}
+
+export async function toggleLikeEcho(echoId: string, userId: string, path: string) {
+    try {
+        connectToDB();
+
+        const echo = await Echo.findById(echoId);
+
+        if (!echo) {
+            throw new Error("Echo not found");
+        }
+
+        const isLiked = echo.likes ? echo.likes.includes(userId) : false;
+
+        if (isLiked) {
+            // strict: false to allow MongoDB to handle the update
+            await Echo.findByIdAndUpdate(echoId, {
+                $pull: { likes: userId }
+            }, { strict: false });
+        } else {
+            await Echo.findByIdAndUpdate(echoId, {
+                $push: { likes: userId }
+            }, { strict: false });
+        }
+
+        revalidatePath(path);
+
+    } catch (error: any) {
+        console.error("Error toggling like:", error);
+        throw new Error(`Error toggling like: ${error.message}`);
     }
 }
