@@ -106,7 +106,7 @@ function PostEcho({ userId, userImage, name, username }: Props) {
         <Form {...form} >
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="mt-4 sm:mt-10 flex flex-col justify-start bg-light-2 p-4 sm:p-6 rounded-2xl border border-dark-4/50 shadow-lg">
+                className="flex flex-col justify-start p-4 sm:px-7 sm:py-4 border-b border-gray-200">
 
                 <div className='flex gap-3 sm:gap-4 w-full'>
                     {/* User Avatar */}

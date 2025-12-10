@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart, MessageCircle, Repeat, Share2 } from "lucide-react";
 
+import { formatTimeAgo } from "@/lib/utils";
+
 interface Props {
     id: string;
     currentUserId: string;
@@ -41,7 +43,7 @@ const EchoCard = ({
     isCommented,
 }: Props) => {
     return (
-        <article className={`flex w-full flex-col bg-gray-300 rounded-xl bg-light-2 p-7 ${isCommented ? 'px-0 xs:px-7' : 'bg-gray-200 p-7'}`}>
+        <article className={`flex w-full flex-col ${isCommented ? 'px-0 xs:px-7' : 'p-7 border-b border-gray-200'}`}>
             <div className="flex items-start justify-between">
                 <div className="flex w-full flex-1 flex-row gap-4">
                     <div className="flex flex-col items-center">
@@ -53,16 +55,18 @@ const EchoCard = ({
                                 className="cursor-pointer rounded-full object-cover"
                             />
                         </Link>
-                        <div className="relative mt-2 w-0.5 grow rounded-full bg-neutral-800" />
                     </div>
 
                     <div className="flex w-full flex-col">
-                        <Link href={`/profile/${author.id}`} className="w-fit">
-                            <h4 className="cursor-pointer text-base-semibold text-dark-1 hover:underline">
-                                {author.name}
-                            </h4>
-                            {/* <p>{timeAgo(createdAt)}</p> */}
-                        </Link>
+                        <div className="flex items-center gap-1">
+                            <Link href={`/profile/${author.id}`} className="w-fit">
+                                <h4 className="cursor-pointer text-base-semibold text-dark-1 hover:underline">
+                                    {author.name}
+                                </h4>
+                            </Link>
+                            <span className="text-small-regular text-gray-500">·</span>
+                            <p className="text-small-regular text-gray-500">{formatTimeAgo(createdAt)}</p>
+                        </div>
 
                         <Link href={`/echo/${id}`}>
                             <p className="mt-2 text-small-regular text-dark-2">
