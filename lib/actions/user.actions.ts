@@ -57,7 +57,7 @@ export async function fetchUser(userId: string) {
         connectToDB();
 
         return await User
-        .findOne({ id: userId })
+            .findOne({ id: userId }).lean()
         // .populate({})
     }
     catch (error: any) {

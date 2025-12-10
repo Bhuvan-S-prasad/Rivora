@@ -24,6 +24,12 @@ const echoSchema = new mongoose.Schema({
             type: String,
         }
     ],
+    likes: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ],
     parentId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Echo',

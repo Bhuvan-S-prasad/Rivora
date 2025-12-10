@@ -47,7 +47,7 @@
 
   --radius: 0.625rem;
 
-  --background: oklch(1 0 0);
+  --background: #FAFAFA;
 
   --foreground: oklch(0.129 0.042 264.695);
   /* Custom Colors */
@@ -253,7 +253,7 @@
 @layer components {
 
   .main-container {
-    @apply flex min-h-screen flex-1 flex-col items-center bg-background text-foreground px-6 pb-10 pt-28 max-md:pb-32 sm:px-10;
+    @apply flex min-h-screen flex-1 flex-col items-center bg-background text-foreground px-0 pb-10 pt-20 max-md:pb-32 sm:px-10;
   }
 
   .head-text {
@@ -293,7 +293,7 @@
   }
 
   .topbar {
-    @apply fixed top-0 z-30 flex w-full items-center justify-between bg-card text-card-foreground px-6 py-3;
+    @apply fixed top-0 z-30 flex w-full items-center justify-between bg-background text-card-foreground px-6 py-3;
   }
 
   .bottombar {
@@ -301,7 +301,7 @@
   }
 
   .leftsidebar {
-    @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-sidebar-border bg-white text-sidebar-foreground pb-5 pt-28 max-md:hidden;
+    @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-sidebar-border bg-background text-sidebar-foreground pb-5 pt-28 max-md:hidden;
   }
 
   .leftsidebar_link {
@@ -309,7 +309,7 @@
   }
 
   .rightsidebar {
-    @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-sidebar-border bg-white text-sidebar-foreground px-10 pb-6 pt-28 max-xl:hidden;
+    @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-sidebar-border bg-background text-sidebar-foreground px-10 pb-6 pt-28 max-xl:hidden;
   }
 
   .pagination {

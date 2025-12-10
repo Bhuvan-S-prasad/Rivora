@@ -57,11 +57,117 @@ export async function fetchEchoes(pageNumber = 1, pageSize = 20) {
 
     const totalPostsCount = await Echo.countDocuments({ parentId: { $in: [null, undefined] } })
 
-    const echos = await echoQuery.exec();
+    const echos = await echoQuery.lean().exec();
+
+    const echosStringified = JSON.parse(JSON.stringify(echos));
 
     const isNext = totalPostsCount > skipAmount + echos.length;
 
-    return { echos, isNext };
+    return { echos: echosStringified, isNext };
 
 
+}
+
+export async function fetchEchoById(id: string) {
+    connectToDB();
+
+    try {
+        const echo = await Echo.findById(id)
+            .populate({
+                path: 'author',
+                model: User,
+                select: "_id id name image"
+            })
+            .populate({
+                path: 'children',
+                populate: [
+                    {
+                        path: 'author',
+                        model: User,
+                        select: "_id id name parentId image"
+                    },
+                    {
+                        path: 'children',
+                        model: Echo,
+                        populate: {
+                            path: 'author',
+                            model: User,
+                            select: "_id id name parentId image"
+                        }
+
+                    }
+                ]
+            }).lean().exec();
+
+        return JSON.parse(JSON.stringify(echo));
+
+    } catch (error) {
+        console.error("Error fetching echo by ID:", error);
+    }
+}
+
+export async function addCommentToEcho(
+    echoId: string,
+    commentText: string,
+    userId: string,
+    path: string,
+) {
+    connectToDB();
+
+    try {
+        const originalEcho = await Echo.findById(echoId);
+
+        if (!originalEcho) {
+            throw new Error("Thread not found");
+        }
+
+        const commentEcho = new Echo({
+            text: commentText,
+            author: userId,
+            parentId: echoId,
+        });
+
+        const savedCommentEcho = await commentEcho.save();
+
+        originalEcho.children.push(savedCommentEcho._id);
+
+        await originalEcho.save();
+
+        revalidatePath(path);
+
+    } catch (error: any) {
+        console.error("Error adding comment to thread:", error);
+        throw new Error(`Error adding comment to thread: ${error.message}`);
+    }
+}
+
+export async function toggleLikeEcho(echoId: string, userId: string, path: string) {
+    try {
+        connectToDB();
+
+        const echo = await Echo.findById(echoId);
+
+        if (!echo) {
+            throw new Error("Echo not found");
+        }
+
+        const isLiked = echo.likes ? echo.likes.includes(userId) : false;
+
+        if (isLiked) {
+            // strict: false to allow MongoDB to handle the update
+            await Echo.findByIdAndUpdate(echoId, {
+                $pull: { likes: userId }
+            }, { strict: false });
+        } else {
+            await Echo.findByIdAndUpdate(echoId, {
+                $push: { likes: userId }
+            }, { strict: false });
+        }
+
+        revalidatePath(path);
+
+    } catch (error: any) {
+        console.error("Error toggling like:", error);
+        throw new Error(`Error toggling like: ${error.message}`);
+    }
 }
