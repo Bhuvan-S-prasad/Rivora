@@ -4,11 +4,10 @@ import { sidebarLinks } from "@/constants";
 import { SignedIn, SignOutButton } from "@clerk/nextjs";
 import { LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 function Leftbar() {
     const pathname = usePathname();
-    const router = useRouter();
 
     return (
         <section className="custom-scrollbar leftsidebar">
@@ -17,12 +16,11 @@ function Leftbar() {
                     const isActive = (pathname.includes(link.route) && link.route.length > 1) || pathname === link.route;
 
                     return (
-                        <div>
+                        <div key={link.label}>
                             <Link href={link.route}
-                                key={link.label}
                                 className={`leftsidebar_link ${isActive && 'bg-primary-500'}`}>
                                 <span className="w-6 h-6">{link.icon}</span>
-                                <p className="text-light-1 max-xs:hidden">{link.label}</p>
+                                <p className="text-dark-1 max-xs:hidden">{link.label}</p>
                             </Link >
                         </div >
                     )
@@ -36,7 +34,7 @@ function Leftbar() {
                     <SignOutButton redirectUrl="/sign-in">
                         <div className="flex cursor-pointer gap-4 p-4">
                             <LogOut />
-                            <p className="text-light-1 max-xs:hidden">Logout</p>
+                            <p className="text-dark-1 max-xs:hidden">Logout</p>
                         </div>
                     </SignOutButton>
                 </SignedIn>

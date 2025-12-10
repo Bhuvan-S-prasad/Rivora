@@ -17,6 +17,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.556.0",
+    "mongodb": "^7.0.0",
+    "mongoose": "^9.0.1",
     "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0",
