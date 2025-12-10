@@ -18,7 +18,7 @@ export const sidebarLinks = [
     },
     {
         icon: <MessageCirclePlusIcon />,
-        route: "/create",
+        route: "/create-echo",
         label: "Create Echo",
     },
     {
