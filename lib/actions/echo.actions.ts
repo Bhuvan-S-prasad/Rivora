@@ -65,3 +65,75 @@ export async function fetchEchoes(pageNumber = 1, pageSize = 20) {
 
 
 }
+
+export async function fetchEchoById(id: string) {
+    connectToDB();
+
+    try {
+        const echo = await Echo.findById(id)
+            .populate({
+                path: 'author',
+                model: User,
+                select: "_id id name image"
+            })
+            .populate({
+                path: 'children',
+                populate: [
+                    {
+                        path: 'author',
+                        model: User,
+                        select: "_id id name parentId image"
+                    },
+                    {
+                        path: 'children',
+                        model: Echo,
+                        populate: {
+                            path: 'author',
+                            model: User,
+                            select: "_id id name parentId image"
+                        }
+
+                    }
+                ]
+            }).exec();
+        return echo;
+
+    } catch (error) {
+        console.error("Error fetching echo by ID:", error);
+    }
+}
+
+export async function addCommentToEcho(
+    echoId: string,
+    commentText: string,
+    userId: string,
+    path: string,
+) {
+    connectToDB();
+
+    try {
+        const originalEcho = await Echo.findById(echoId);
+
+        if (!originalEcho) {
+            throw new Error("Thread not found");
+        }
+
+        const commentEcho = new Echo({
+            text: commentText,
+            author: userId,
+            parentId: echoId,
+        });
+
+        const savedCommentEcho = await commentEcho.save();
+
+        originalEcho.children.push(savedCommentEcho._id);
+
+        await originalEcho.save();
+
+        revalidatePath(path);
+
+    } catch (error: any) {
+        console.error("Error adding comment to thread:", error);
+        throw new Error(`Error adding comment to thread: ${error.message}`);
+    }
+}
