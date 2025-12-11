@@ -34,12 +34,13 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
                     likes={echo.likes ? echo.likes : []}
                     createdAt={echo.createdAt}
                     comments={echo.children}
+                    hideReplyList={true}
                 />
             </div>
 
             <div className="mt-7">
                 <Comment
-                    echoId={echo.id}
+                    echoId={echo._id}
                     currentUserImg={userInfo.image}
                     currentUserId={JSON.stringify(userInfo._id)}
                 />

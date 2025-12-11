@@ -1,4 +1,4 @@
-import { Heart, HomeIcon, MessageCirclePlusIcon, SearchIcon, UserRound, UsersIcon } from "lucide-react";
+import { Heart, HomeIcon, MessageCirclePlusIcon, SearchIcon, Tag, UserRound, Users, UsersIcon } from "lucide-react";
 
 export const sidebarLinks = [
     {
@@ -32,3 +32,9 @@ export const sidebarLinks = [
         label: "Profile"
     }
 ]
+
+export const profileTabs = [
+    { value: "echos", label: "Echos", icon: <MessageCirclePlusIcon /> },
+    { value: "replies", label: "Replies", icon: <Users /> },
+    { value: "tagged", label: "Tagged", icon: <Tag /> },
+];

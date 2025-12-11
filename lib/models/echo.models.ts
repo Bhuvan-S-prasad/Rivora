@@ -26,8 +26,7 @@ const echoSchema = new mongoose.Schema({
     ],
     likes: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+            type: String, // Storing Clerk User IDs (Strings), so no ObjectId/Ref to internal User._id
         }
     ],
     parentId: {

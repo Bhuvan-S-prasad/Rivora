@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import User from "../models/user.models";
 import { connectToDB } from "../mongoose";
+import Echo from "../models/echo.models";
 
 
 interface Params {
@@ -62,5 +63,32 @@ export async function fetchUser(userId: string) {
     }
     catch (error: any) {
         throw new Error(`Failed to fetch user: ${error}`);
+    }
+}
+
+export async function fetchUserPosts(userId: string) {
+    try {
+        connectToDB();
+
+        const echoes = await User.findOne({ id: userId })
+            .populate({
+                path: "echos",
+                model: Echo,
+                populate: {
+                    path: 'children',
+                    model: Echo,
+                    populate: {
+                        path: 'author',
+                        model: User,
+                        select: 'name image id _id'
+                    }
+                }
+            })
+            .lean();
+
+        return JSON.parse(JSON.stringify(echoes));
+    }
+    catch (error: any) {
+        throw new Error(`Failed to fetch user posts: ${error}`);
     }
 }

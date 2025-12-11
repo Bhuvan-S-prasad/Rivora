@@ -94,16 +94,16 @@ export async function fetchEchoById(id: string) {
                             model: User,
                             select: "_id id name parentId image"
                         }
-
                     }
                 ]
-            }).lean().exec();
-
-        return JSON.parse(JSON.stringify(echo));
+            
+        }).lean().exec();
+        
+    return JSON.parse(JSON.stringify(echo));
 
     } catch (error) {
-        console.error("Error fetching echo by ID:", error);
-    }
+    console.error("Error fetching echo by ID:", error);
+}
 }
 
 export async function addCommentToEcho(
@@ -112,13 +112,13 @@ export async function addCommentToEcho(
     userId: string,
     path: string,
 ) {
-    connectToDB();
+    await connectToDB();
 
     try {
         const originalEcho = await Echo.findById(echoId);
 
         if (!originalEcho) {
-            throw new Error("Thread not found");
+            throw new Error("Echo not found");
         }
 
         const commentEcho = new Echo({
@@ -136,8 +136,8 @@ export async function addCommentToEcho(
         revalidatePath(path);
 
     } catch (error: any) {
-        console.error("Error adding comment to thread:", error);
-        throw new Error(`Error adding comment to thread: ${error.message}`);
+        console.error("Error adding comment to Echo:", error);
+        throw new Error(`Error adding comment to Echo: ${error.message}`);
     }
 }
 
