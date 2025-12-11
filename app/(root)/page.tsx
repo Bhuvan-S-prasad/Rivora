@@ -15,19 +15,20 @@ export default async function Home() {
   }
 
   const userInfo = await fetchUser(user.id);
+  console.log(userInfo)
   if (!userInfo?.onboarded) redirect("/onboarding");
 
   return (
     <div className="flex flex-col">
       <div className="bg-white rounded-t-2xl border-x border-t border-b-0 border-gray-200 overflow-hidden">
-        <PostEcho userId={userInfo._id.toString()} userImage={userInfo.image} />
+        <PostEcho userId={userInfo._id.toString()} username={userInfo.username} userImage={userInfo.image} />
 
         <section className="flex flex-col">
           {result.echos.length === 0 ? (
             <p className="no-result p-4">No echos found</p>
           ) : (
             <>
-              {result.echos.map((echo) => (
+              {result.echos.map((echo: any) => (
                 <EchoCard
                   key={echo._id}
                   id={echo._id}
