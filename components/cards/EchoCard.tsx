@@ -8,6 +8,10 @@ import { formatTimeAgo } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { toggleLikeEcho } from "@/lib/actions/echo.actions";
 
+// Add useState to imports
+import { useState } from "react";
+
+// Update Props
 interface Props {
     id: string;
     currentUserId: string;
@@ -26,13 +30,9 @@ interface Props {
     images: string[] | null;
     likes: string[];
     createdAt: Date;
-    comments: {
-        author: {
-            name: string;
-            image: string;
-        }
-    }[]
+    comments: any[]; // Changed to any[] to support recursive structure
     isCommented?: boolean;
+    hideReplyList?: boolean;
 }
 
 const EchoCard = ({
@@ -45,9 +45,11 @@ const EchoCard = ({
     images,
     likes,
     createdAt,
-    comments,
+    comments = [],
     isCommented,
+    hideReplyList,
 }: Props) => {
+    const [showReplies, setShowReplies] = useState(false);
     const pathname = usePathname();
     const isLiked = likes.includes(currentUserId);
 
@@ -56,13 +58,13 @@ const EchoCard = ({
     };
 
     return (
-        <article className={`flex w-full flex-col ${isCommented ? 'px-0 xs:px-7' : 'p-7 border-b border-gray-200'}`}>
+        <article className={`flex w-full flex-col ${isCommented ? 'px-0 xs:px-7 mb-4' : 'p-7 border-b border-gray-200'}`}> {/* Added mb-4 for spacing */}
             <div className="flex items-start justify-between">
                 <div className="flex w-full flex-1 flex-row gap-4">
                     <div className="flex flex-col items-center">
-                        <Link href={`/profile/${author.id}`} className="relative h-11 w-11">
+                        <Link href={`/profile/${author?.id}`} className="relative h-11 w-11">
                             <Image
-                                src={author.image}
+                                src={author?.image || '/assets/icons/user.svg'} // Fallback image
                                 alt="Profile Image"
                                 fill
                                 className="cursor-pointer rounded-full object-cover"
@@ -72,13 +74,13 @@ const EchoCard = ({
 
                     <div className="flex w-full flex-col">
                         <div className="flex items-center gap-1">
-                            <Link href={`/profile/${author.id}`} className="w-fit">
+                            <Link href={`/profile/${author?.id}`} className="w-fit">
                                 <h4 className="cursor-pointer text-base-semibold text-dark-1 hover:underline">
-                                    {author.name}
+                                    {author?.name || 'Unknown User'}
                                 </h4>
                             </Link>
                             <span className="text-small-regular text-gray-500">·</span>
-                            <p className="text-small-regular text-gray-500">{formatTimeAgo(createdAt)}</p>
+                            <p className="text-small-regular text-gray-500" suppressHydrationWarning>{formatTimeAgo(createdAt)}</p>
                         </div>
 
                         <Link href={`/echo/${id}`}>
@@ -151,6 +153,43 @@ const EchoCard = ({
                                 </Link>
                             )}
                         </div>
+
+                        {/* Nested Comments Section */}
+                        {!hideReplyList && comments.length > 0 && (
+                            <div className='mt-4 w-full'>
+                                <button
+                                    className='text-subtle-medium text-gray-500 hover:text-primary-500 flex items-center gap-2 cursor-pointer mb-2'
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setShowReplies(!showReplies);
+                                    }}
+                                >
+                                    <div className="w-4 h-px bg-slate-200"></div>
+                                    {showReplies ? "Hide replies" : `View ${comments.length} replies`}
+                                </button>
+
+                                {showReplies && (
+                                    <div className='flex flex-col gap-4 pl-4 border-l-2 border-slate-100'>
+                                        {comments.map((comment: any) => (
+                                            <EchoCard
+                                                key={comment._id}
+                                                id={comment._id}
+                                                currentUserId={currentUserId}
+                                                parentId={comment.parentId}
+                                                content={comment.text}
+                                                author={comment.author}
+                                                rift={comment.rift}
+                                                images={comment.images}
+                                                likes={comment.likes ? comment.likes : []}
+                                                createdAt={comment.createdAt}
+                                                comments={comment.children}
+                                                isCommented={true}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

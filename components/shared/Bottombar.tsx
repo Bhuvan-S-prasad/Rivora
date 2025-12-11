@@ -3,14 +3,19 @@
 import { sidebarLinks } from "@/constants";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 
 function Bottombar() {
     const pathname = usePathname();
+    const { userId } = useAuth();
+
     return (
         <section className="bottombar">
             <div className="bottombar_container">
                 {sidebarLinks.map((link) => {
                     const isActive = (pathname.includes(link.route) && link.route.length > 1) || pathname === link.route;
+
+                    if (link.route === '/profile') link.route = `${link.route}/${userId}`
                     return (
                         <div key={link.label}>
                             <Link href={link.route}
