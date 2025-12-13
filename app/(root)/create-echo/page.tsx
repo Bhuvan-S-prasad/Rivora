@@ -12,7 +12,7 @@ async function Page() {
 
     if (!userInfo?.onboarded) redirect("/onboarding");
     return (
-        <main>
+        <main className="max-w-7xl mx-auto">
             <h1 className="head-text">Create Echo</h1>
             <PostEcho userId={userInfo?._id.toString()} userImage={userInfo?.image} name={userInfo?.name} username={userInfo?.username} />
         </main>

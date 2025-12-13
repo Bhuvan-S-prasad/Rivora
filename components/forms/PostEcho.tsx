@@ -106,7 +106,7 @@ function PostEcho({ userId, userImage, name, username }: Props) {
         <Form {...form} >
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col justify-start p-4 sm:px-7 sm:py-4 border-b border-gray-200">
+                className="mt-5 flex flex-col justify-start p-4 sm:px-7 sm:py-4 border-b border-gray-200">
 
                 <div className='flex gap-3 sm:gap-4 w-full'>
                     {/* User Avatar */}
@@ -175,7 +175,7 @@ function PostEcho({ userId, userImage, name, username }: Props) {
                             </div>
                         )}
 
-                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-dark-4">
+                        <div className="flex items-center justify-between mt-4 pt-3">
                             <div className="flex items-center gap-4">
                                 <input
                                     type="file"
