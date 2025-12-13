@@ -21,51 +21,52 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
 
     return (
         <section className="relative">
-            <div>
-                <EchoCard
-                    key={echo._id}
-                    id={echo._id}
-                    currentUserId={user?.id || ""}
-                    parentId={echo.parentId}
-                    content={echo.text}
-                    author={echo.author}
-                    rift={echo.rift}
-                    images={echo.images}
-                    likes={echo.likes ? echo.likes : []}
-                    createdAt={echo.createdAt}
-                    comments={echo.children}
-                    hideReplyList={true}
-                />
-            </div>
-
-            <div className="mt-7">
-                <Comment
-                    echoId={echo._id}
-                    currentUserImg={userInfo.image}
-                    currentUserId={JSON.stringify(userInfo._id)}
-                />
-            </div>
-
-            <div className="mt-10">
-                {echo.children.map((childItem: any, index: number) => (
+            <div className="bg-white rounded-t-2xl border-x border-t border-b-0 border-gray-200 overflow-hidden min-h-screen">
+                <div>
                     <EchoCard
-                        key={childItem._id || index}
-                        id={childItem._id}
+                        key={echo._id}
+                        id={echo._id}
                         currentUserId={user?.id || ""}
-                        parentId={childItem.parentId}
-                        content={childItem.text}
-                        author={childItem.author}
-                        rift={childItem.rift}
-                        images={childItem.images}
-                        likes={childItem.likes ? childItem.likes : []}
-                        createdAt={childItem.createdAt}
-                        comments={childItem.children}
-                        isCommented
+                        parentId={echo.parentId}
+                        content={echo.text}
+                        author={echo.author}
+                        rift={echo.rift}
+                        images={echo.images}
+                        likes={echo.likes ? echo.likes : []}
+                        createdAt={echo.createdAt}
+                        comments={echo.children}
+                        hideReplyList={true}
                     />
-                ))}
+                </div>
 
+                <div className="mt-7 px-10">
+                    <Comment
+                        echoId={echo._id}
+                        currentUserImg={userInfo.image}
+                        currentUserId={JSON.stringify(userInfo._id)}
+                    />
+                </div>
+
+                <div className="mt-10">
+                    {echo.children.map((childItem: any, index: number) => (
+                        <EchoCard
+                            key={childItem._id || index}
+                            id={childItem._id}
+                            currentUserId={user?.id || ""}
+                            parentId={childItem.parentId}
+                            content={childItem.text}
+                            author={childItem.author}
+                            rift={childItem.rift}
+                            images={childItem.images}
+                            likes={childItem.likes ? childItem.likes : []}
+                            createdAt={childItem.createdAt}
+                            comments={childItem.children}
+                            isCommented
+                        />
+                    ))}
+
+                </div>
             </div>
-
         </section>
 
     )

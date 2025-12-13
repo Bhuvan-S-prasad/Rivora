@@ -5,7 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Topbar from "@/components/shared/Topbar";
 import Bottombar from "@/components/shared/Bottombar";
 import Leftbar from "@/components/shared/Leftbar";
-import Rightbar from "@/components/shared/Rightbar";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,11 +41,12 @@ export default function RootLayout({
                 {children}
               </div>
             </section>
-            <Rightbar />
+
+            <div className="w-[270px] max-md:hidden" />
           </main>
           <Bottombar />
         </body>
       </html>
-    </ClerkProvider>
+    </ClerkProvider >
   );
 }

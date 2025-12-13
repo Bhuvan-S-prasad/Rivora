@@ -49,7 +49,7 @@ const Comment = ({ echoId, currentUserImg, currentUserId }: Props) => {
         <Form {...form}>
             <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="mt-10 flex items-center gap-4 border-y border-y-dark-4 py-5 max-xs:flex-col"
+                className="mt-10 flex items-center gap-4 py-5 max-xs:flex-col"
             >
                 <FormField
                     control={form.control}
@@ -68,8 +68,8 @@ const Comment = ({ echoId, currentUserImg, currentUserId }: Props) => {
                             <FormControl className='border-none bg-transparent'>
                                 <Input
                                     type="text"
-                                    placeholder="Comment..."
-                                    className="no-focus text-dark-1 outline-none"
+                                    placeholder="Comment..."    
+                                    className="no-focus  text-dark-1 outline-none"
                                     {...field}
                                 />
                             </FormControl>

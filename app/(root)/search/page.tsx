@@ -1,6 +1,7 @@
 import UserCard from "@/components/cards/UserCard";
 import { fetchUser, fetchUsers } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 
@@ -30,14 +31,15 @@ async function Page() {
 
                 ) : (
                     <>
-                        {result.users.map((person: { _id: string; name: string; username: string; image: string }) => (
-                            <UserCard
-                                key={person._id}
-                                id={person._id}
-                                name={person.name}
-                                username={person.username}
-                                image={person.image}
-                                personType="User" />
+                        {result.users.map((person: { _id: string; id: string; name: string; username: string; image: string }) => (
+                            <Link href={`/profile/${person.id}`} key={person.id}>
+                                <UserCard
+                                    id={person.id}
+                                    name={person.name}
+                                    username={person.username}
+                                    image={person.image}
+                                    personType="User" />
+                            </Link>
                         ))}
                     </>
                 )}
