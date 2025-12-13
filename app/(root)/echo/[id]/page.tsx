@@ -47,9 +47,9 @@ const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
             </div>
 
             <div className="mt-10">
-                {echo.children.map((childItem: any) => (
+                {echo.children.map((childItem: any, index: number) => (
                     <EchoCard
-                        key={childItem._id}
+                        key={childItem._id || index}
                         id={childItem._id}
                         currentUserId={user?.id || ""}
                         parentId={childItem.parentId}
