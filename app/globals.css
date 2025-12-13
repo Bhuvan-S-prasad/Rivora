@@ -4,42 +4,60 @@
 @layer theme, base, clerk, components, utilities;
 
 /* -------------------------------------------------------------- */
-/*  🌈 1. Root Theme Values                                       */
+/*  🌈 1. Root Theme — TWITTER/X LIGHT MODE                      */
 /* -------------------------------------------------------------- */
 
 :root {
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  /* Light mode base colors */
+  --background: #FAFAFA;
+  --foreground: #1C1C1C;
 
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --card: #FFFFFF;
+  --card-foreground: #1C1C1C;
 
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1C1C;
+
+  /* Primary → TWITTER BLUE */
+  --primary: #1DA1F2;
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary neutrals */
+  --secondary: #6E6E6E;
+  --secondary-foreground: #FFFFFF;
+
+  --muted: #F5F5F5;
+  --muted-foreground: #6E6E6E;
+
+  --accent: #1DA1F2;
+  --accent-foreground: #FFFFFF;
+
+  --destructive: #FF5A5A;
+  --destructive-foreground: #FFFFFF;
+
+  --border: #E5E5E5;
+  --input: #E5E5E5;
+
+  /* Ring → Twitter Blue */
+  --ring: #1DA1F2;
+
+  /* Charts (neutral + blue tone) */
+  --chart-1: #1DA1F2;
+  --chart-2: #0C7ABF;
+  --chart-3: #6E6E6E;
+  --chart-4: #FFB620;
+  --chart-5: #FF9F40;
+
+  /* Sidebar colors */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1C1C1C;
+  --sidebar-primary: #1DA1F2;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F0F8FF;
+  /* light blue tint */
+  --sidebar-accent-foreground: #1C1C1C;
+  --sidebar-border: #E5E5E5;
+  --sidebar-ring: #1DA1F2;
 
   --font-sans: Geist, sans-serif;
   --font-serif: Georgia, serif;
@@ -47,64 +65,81 @@
 
   --radius: 0.625rem;
 
-  --background: #FAFAFA;
-
-  --foreground: oklch(0.129 0.042 264.695);
-  /* Custom Colors */
-  --primary-500: #0ea3fa;
-  --secondary-500: #FFB620;
-  --blue: #0095F6;
+  /* Custom values */
+  --primary-500: #1DA1F2;
+  /* MAIN brand blue */
+  --secondary-500: #A8A8A8;
   --logout-btn: #FF5A5A;
-  --navbar-menu: rgba(16, 16, 18, 0.6);
+
+  /* X/Twitter dark neutrals */
   --dark-1: #000000;
-  --dark-2: #121417;
-  --dark-3: #101012;
-  --dark-4: #1F1F22;
+  --dark-2: #121212;
+  --dark-3: #1A1A1A;
+  --dark-4: #2C2C2C;
+
   --light-1: #FFFFFF;
   --light-2: #EFEFEF;
-  --light-3: #7878A3;
-  --light-4: #5C5C7B;
+  --light-3: #A8A8A8;
+  --light-4: #6E6E6E;
+
   --gray-1: #697C89;
+
+  /* Popup blur */
   --glassmorphism: rgba(16, 16, 18, 0.60);
 }
 
 /* -------------------------------------------------------------- */
-/*  🌙 Dark Mode                                                  */
+/*  🌙 Dark Mode — TWITTER/X DARK MODE                           */
 /* -------------------------------------------------------------- */
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
+  --background: #000000;
+  --foreground: #FFFFFF;
 
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --destructive: oklch(0.704 0.191 22.216);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --card: #121212;
+  --card-foreground: #FFFFFF;
+
+  --popover: #121212;
+  --popover-foreground: #FFFFFF;
+
+  /* Twitter blue */
+  --primary: #1DA1F2;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #A8A8A8;
+  --secondary-foreground: #FFFFFF;
+
+  --muted: #1A1A1A;
+  --muted-foreground: #A8A8A8;
+
+  --accent: #1DA1F2;
+  --accent-foreground: #FFFFFF;
+
+  /* Borders → X grey */
+  --border: #2C2C2C;
+  --input: #2C2C2C;
+
+  --ring: #1DA1F2;
+
+  --destructive: #FF5A5A;
+  --destructive-foreground: #FFFFFF;
+
+  /* Charts */
+  --chart-1: #1DA1F2;
+  --chart-2: #0C7ABF;
+  --chart-3: #6E6E6E;
+  --chart-4: #FFB620;
+  --chart-5: #FF9F40;
+
+  /* Sidebar Dark */
+  --sidebar: #000000;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #1DA1F2;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1A1A1A;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #2C2C2C;
+  --sidebar-ring: #1DA1F2;
 }
 
 /* -------------------------------------------------------------- */
@@ -132,6 +167,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* Sidebar */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -144,12 +180,8 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
 
+  /* Typography — unchanged */
   --breakpoint-xs: 30rem;
-
-  /* ---------------------------------------- */
-  /* 📌 Custom Text Scale (Your old Tailwind) */
-  /* ---------------------------------------- */
-
   --text-heading1-bold: 36px;
   --text-heading1-semibold: 36px;
 
@@ -177,11 +209,15 @@
 
   --text-tiny-medium: 10px;
   --text-x-small-semibold: 7px;
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
+
+  /* Charts */
   --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Border radii */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -189,7 +225,7 @@
 }
 
 /* -------------------------------------------------------------- */
-/*  🌈 3. Custom Utility Classes                                 */
+/*  🌈 3. Utilities                                               */
 /* -------------------------------------------------------------- */
 
 @layer utilities {
@@ -235,9 +271,6 @@
 
   .no-scrollbar::-webkit-scrollbar {
     display: none !important;
-    height: 0 !important;
-    width: 0 !important;
-    background: transparent;
   }
 
   .no-scrollbar {
@@ -251,7 +284,6 @@
 /* -------------------------------------------------------------- */
 
 @layer components {
-
   .main-container {
     @apply flex min-h-screen flex-1 flex-col items-center bg-background text-foreground px-0 pb-10 pt-20 max-md:pb-32 sm:px-10;
   }
@@ -261,7 +293,7 @@
   }
 
   .activity-card {
-    @apply flex items-center gap-2 rounded-md bg-card text-card-foreground px-7 py-4;
+    @apply flex items-center gap-2 rounded-md bg-card text-card-foreground px-7 py-4 border border-border;
   }
 
   .no-result {
@@ -269,7 +301,7 @@
   }
 
   .community-card {
-    @apply w-full rounded-lg bg-card text-card-foreground px-4 py-5 sm:w-96;
+    @apply w-full rounded-lg bg-card text-card-foreground px-4 py-5 sm:w-96 border border-border;
   }
 
   .community-card_btn {
@@ -277,7 +309,7 @@
   }
 
   .user-card {
-    @apply flex flex-col justify-between gap-4 bg-card text-card-foreground max-xs:rounded-xl max-xs:p-4 xs:flex-row xs:items-center;
+    @apply flex flex-col justify-between gap-4 bg-card text-card-foreground border border-border max-xs:rounded-xl max-xs:p-4 xs:flex-row xs:items-center;
   }
 
   .user-card_btn {
@@ -293,15 +325,15 @@
   }
 
   .topbar {
-    @apply fixed top-0 z-30 flex w-full items-center justify-between bg-background text-card-foreground px-6 py-3;
+    @apply fixed top-0 z-30 flex w-full items-center justify-between bg-background text-foreground px-6 py-3 border-border;
   }
 
   .bottombar {
-    @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-background/60 backdrop-blur-lg p-4 xs:px-7 md:hidden;
+    @apply fixed bottom-0 z-10 w-full rounded-t-3xl bg-background/60 backdrop-blur-lg p-4 border-t border-border xs:px-7 md:hidden;
   }
 
   .leftsidebar {
-    @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-sidebar-border bg-background text-sidebar-foreground pb-5 pt-28 max-md:hidden;
+    @apply sticky left-0 top-0 z-20 flex h-screen w-fit flex-col justify-between overflow-auto border-border bg-background text-foreground pb-5 pt-28 max-md:hidden;
   }
 
   .leftsidebar_link {
@@ -309,7 +341,7 @@
   }
 
   .rightsidebar {
-    @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-sidebar-border bg-background text-sidebar-foreground px-10 pb-6 pt-28 max-xl:hidden;
+    @apply sticky right-0 top-0 z-20 flex h-screen w-fit flex-col justify-between gap-12 overflow-auto border-border bg-background text-foreground px-10 pb-6 pt-28 max-xl:hidden;
   }
 
   .pagination {
@@ -338,12 +370,16 @@
   }
 
   .account-form_input {
-    @apply border;
+    @apply border rounded-md px-3 py-2;
     border-color: var(--light-2) !important;
     background-color: var(--light-1) !important;
     color: var(--dark-1) !important;
   }
 }
+
+/* -------------------------------------------------------------- */
+/*  🌈 5. Base                                                    */
+/* -------------------------------------------------------------- */
 
 @layer base {
   * {

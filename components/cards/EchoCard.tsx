@@ -30,7 +30,7 @@ interface Props {
     images: string[] | null;
     likes: string[];
     createdAt: Date;
-    comments: any[]; // Changed to any[] to support recursive structure
+    comments: any[]; 
     isCommented?: boolean;
     hideReplyList?: boolean;
 }
@@ -85,7 +85,13 @@ const EchoCard = ({
 
                         <Link href={`/echo/${id}`}>
                             <p className="mt-2 text-small-regular text-dark-2 whitespace-pre-wrap">
-                                {content}
+                                {(content || "").split(/(@\w+)/g).map((part, index) => (
+                                    part.startsWith('@') ? (
+                                        <span key={index} className="text-primary-500 font-semibold mr-1">{part}</span>
+                                    ) : (
+                                        <span key={index}>{part}</span>
+                                    )
+                                ))}
                             </p>
                         </Link>
 
@@ -141,55 +147,17 @@ const EchoCard = ({
                                 </div>
                             </Link>
 
-                            {/* Share */}
                             <div className="flex gap-2 items-center group cursor-pointer">
                                 <Share2 className="w-5 h-5 text-gray-1 group-hover:text-blue transition-colors" />
                             </div>
 
-                            {/* Comment */}
-                            {isCommented && comments.length > 0 && (
+                            {isCommented && comments && comments.length > 0 && (
                                 <Link href={`/echo/${id}`} className="flex gap-2 items-center group cursor-pointer">
-                                    <p className="mt-1 text-subtle-medium">{comments.length} replies </p>
+                                    <p className="mt-1 text-subtle-medium text-gray-400">{comments.length} replies</p>
                                 </Link>
                             )}
                         </div>
 
-                        {/* Nested Comments Section */}
-                        {!hideReplyList && comments.length > 0 && (
-                            <div className='mt-4 w-full'>
-                                <button
-                                    className='text-subtle-medium text-gray-500 hover:text-primary-500 flex items-center gap-2 cursor-pointer mb-2'
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setShowReplies(!showReplies);
-                                    }}
-                                >
-                                    <div className="w-4 h-px bg-slate-200"></div>
-                                    {showReplies ? "Hide replies" : `View ${comments.length} replies`}
-                                </button>
-
-                                {showReplies && (
-                                    <div className='flex flex-col gap-4 pl-4 border-l-2 border-slate-100'>
-                                        {comments.map((comment: any) => (
-                                            <EchoCard
-                                                key={comment._id}
-                                                id={comment._id}
-                                                currentUserId={currentUserId}
-                                                parentId={comment.parentId}
-                                                content={comment.text}
-                                                author={comment.author}
-                                                rift={comment.rift}
-                                                images={comment.images}
-                                                likes={comment.likes ? comment.likes : []}
-                                                createdAt={comment.createdAt}
-                                                comments={comment.children}
-                                                isCommented={true}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
