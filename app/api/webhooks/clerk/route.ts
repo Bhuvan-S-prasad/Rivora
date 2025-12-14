@@ -1,10 +1,8 @@
-
 import { Webhook, WebhookRequiredHeaders } from "svix";
 import { headers } from "next/headers";
-
 import { IncomingHttpHeaders } from "http";
-
 import { NextResponse } from "next/server";
+
 import {
     addMemberToRift,
     createRift,
@@ -12,6 +10,11 @@ import {
     removeUserFromRift,
     updateRiftInfo,
 } from "@/lib/actions/rift.actions";
+
+/**
+ * IMPORTANT: Clerk webhooks must run on Node (not Edge)
+ */
+export const runtime = "nodejs";
 
 type EventType =
     | "organization.created"
@@ -22,49 +25,79 @@ type EventType =
     | "organization.deleted";
 
 type Event = {
-    data: Record<string, string | number | Record<string, string>[]>;
+    data: any;
     object: "event";
     type: EventType;
 };
 
-export const POST = async (request: Request) => {
-    const payload = await request.json();
-    const header = await headers();
+export async function POST(request: Request) {
+    console.log("📨 Clerk webhook received");
 
-    const heads = {
-        "svix-id": header.get("svix-id"),
-        "svix-timestamp": header.get("svix-timestamp"),
-        "svix-signature": header.get("svix-signature"),
+    const payload = await request.text();
+
+    const headerList = await headers();
+
+    const svixHeaders = {
+        "svix-id": headerList.get("svix-id"),
+        "svix-timestamp": headerList.get("svix-timestamp"),
+        "svix-signature": headerList.get("svix-signature"),
     };
 
-    // Activitate Webhook in the Clerk Dashboard.
-    // After adding the endpoint, you'll see the secret on the right side.
-    const wh = new Webhook(process.env.NEXT_CLERK_WEBHOOK_SECRET || "");
-
-    let evnt: Event | null = null;
-
-    try {
-        evnt = wh.verify(
-            JSON.stringify(payload),
-            heads as IncomingHttpHeaders & WebhookRequiredHeaders
-        ) as Event;
-    } catch (err) {
-        return NextResponse.json({ message: err }, { status: 400 });
+    if (
+        !svixHeaders["svix-id"] ||
+        !svixHeaders["svix-timestamp"] ||
+        !svixHeaders["svix-signature"]
+    ) {
+        return NextResponse.json(
+            { error: "Missing Svix headers" },
+            { status: 400 }
+        );
     }
 
-    const eventType: EventType = evnt?.type!;
+    /* ------------------------------------------------------------------ */
+    /* 3. Verify webhook signature                                        */
+    /* ------------------------------------------------------------------ */
+    const webhookSecret = process.env.NEXT_CLERK_WEBHOOK_SECRET;
 
-    // Listen organization creation event
-    if (eventType === "organization.created") {
-        // Resource: https://clerk.com/docs/reference/backend-api/tag/Organizations#operation/CreateOrganization
-        // Show what evnt?.data sends from above resource
-        const { id, name, slug, logo_url, image_url, created_by } =
-            evnt?.data ?? {};
+    if (!webhookSecret) {
+        console.error("❌ Missing NEXT_CLERK_WEBHOOK_SECRET");
+        return NextResponse.json(
+            { error: "Webhook secret not configured" },
+            { status: 500 }
+        );
+    }
 
-        try {
-            // @ts-ignore
+    const wh = new Webhook(webhookSecret);
+
+    let event: Event;
+
+    try {
+        event = wh.verify(
+            payload,
+            svixHeaders as IncomingHttpHeaders & WebhookRequiredHeaders
+        ) as Event;
+    } catch (err) {
+        console.error("❌ Webhook verification failed:", err);
+        return NextResponse.json(
+            { error: "Invalid webhook signature" },
+            { status: 400 }
+        );
+    }
+
+    console.log("✅ Webhook verified:", event.type);
+
+    /* ------------------------------------------------------------------ */
+    /* 4. Handle events                                                   */
+    /* ------------------------------------------------------------------ */
+
+    const eventType = event.type;
+    const data = event.data;
+
+    try {
+        if (eventType === "organization.created") {
+            const { id, name, slug, logo_url, image_url, created_by } = data;
+
             await createRift(
-                // @ts-ignore
                 id,
                 name,
                 slug,
@@ -73,129 +106,76 @@ export const POST = async (request: Request) => {
                 created_by
             );
 
-            return NextResponse.json({ message: "User created" }, { status: 201 });
-        } catch (err) {
-            console.log(err);
-            return NextResponse.json(
-                { message: "Internal Server Error" },
-                { status: 500 }
-            );
+            return NextResponse.json({ message: "Organization created" }, { status: 201 });
         }
-    }
 
-    // Listen organization invitation creation event.
-    // Just to show. You can avoid this or tell people that we can create a new mongoose action and
-    // add pending invites in the database.
-    if (eventType === "organizationInvitation.created") {
-        try {
-            // Resource: https://clerk.com/docs/reference/backend-api/tag/Organization-Invitations#operation/CreateOrganizationInvitation
-            console.log("Invitation created", evnt?.data);
+        if (eventType === "organizationInvitation.created") {
+            console.log("📩 Invitation created:", data);
+            return NextResponse.json({ message: "Invitation created" }, { status: 201 });
+        }
+
+        if (eventType === "organizationMembership.created") {
+            const { organization, public_user_data } = data;
+
+            await addMemberToRift(
+                organization.id,
+                public_user_data.user_id
+            );
 
             return NextResponse.json(
-                { message: "Invitation created" },
+                { message: "Member added" },
                 { status: 201 }
             );
-        } catch (err) {
-            console.log(err);
-
-            return NextResponse.json(
-                { message: "Internal Server Error" },
-                { status: 500 }
-            );
         }
-    }
 
-    // Listen organization membership (member invite & accepted) creation
-    if (eventType === "organizationMembership.created") {
-        try {
-            // Resource: https://clerk.com/docs/reference/backend-api/tag/Organization-Memberships#operation/CreateOrganizationMembership
-            // Show what evnt?.data sends from above resource
-            const { organization, public_user_data } = evnt?.data;
-            console.log("created", evnt?.data);
+        if (eventType === "organizationMembership.deleted") {
+            const { organization, public_user_data } = data;
 
-            // @ts-ignore
-            await addMemberToRift(organization.id, public_user_data.user_id);
+            await removeUserFromRift(
+                public_user_data.user_id,
+                organization.id
+            );
 
             return NextResponse.json(
-                { message: "Invitation accepted" },
+                { message: "Member removed" },
                 { status: 201 }
             );
-        } catch (err) {
-            console.log(err);
-
-            return NextResponse.json(
-                { message: "Internal Server Error" },
-                { status: 500 }
-            );
         }
-    }
 
-    // Listen member deletion event
-    if (eventType === "organizationMembership.deleted") {
-        try {
-            // Resource: https://clerk.com/docs/reference/backend-api/tag/Organization-Memberships#operation/DeleteOrganizationMembership
-            // Show what evnt?.data sends from above resource
-            const { organization, public_user_data } = evnt?.data;
-            console.log("removed", evnt?.data);
+        if (eventType === "organization.updated") {
+            const { id, logo_url, name, slug } = data;
 
-            // @ts-ignore
-            await removeUserFromRift(public_user_data.user_id, organization.id);
-
-            return NextResponse.json({ message: "Member removed" }, { status: 201 });
-        } catch (err) {
-            console.log(err);
-
-            return NextResponse.json(
-                { message: "Internal Server Error" },
-                { status: 500 }
-            );
-        }
-    }
-
-    // Listen organization updation event
-    if (eventType === "organization.updated") {
-        try {
-            // Resource: https://clerk.com/docs/reference/backend-api/tag/Organizations#operation/UpdateOrganization
-            // Show what evnt?.data sends from above resource
-            const { id, logo_url, name, slug } = evnt?.data;
-            console.log("updated", evnt?.data);
-
-            // @ts-ignore
             await updateRiftInfo(id, name, slug, logo_url);
 
-            return NextResponse.json({ message: "Member removed" }, { status: 201 });
-        } catch (err) {
-            console.log(err);
-
             return NextResponse.json(
-                { message: "Internal Server Error" },
-                { status: 500 }
+                { message: "Organization updated" },
+                { status: 201 }
             );
         }
-    }
 
-    // Listen organization deletion event
-    if (eventType === "organization.deleted") {
-        try {
-            // Resource: https://clerk.com/docs/reference/backend-api/tag/Organizations#operation/DeleteOrganization
-            // Show what evnt?.data sends from above resource
-            const { id } = evnt?.data;
-            console.log("deleted", evnt?.data);
+        if (eventType === "organization.deleted") {
+            const { id } = data;
 
-            // @ts-ignore
             await deleteRift(id);
 
             return NextResponse.json(
                 { message: "Organization deleted" },
                 { status: 201 }
             );
-        } catch (err) {
-            console.log(err);
-
-            return NextResponse.json(
-                { message: "Internal Server Error" },
-                { status: 500 }
-            );
         }
+    } catch (err) {
+        console.error("❌ Webhook handler error:", err);
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
+        );
     }
-};
+
+    /* ------------------------------------------------------------------ */
+    /* 5. REQUIRED fallback (prevents 405)                                 */
+    /* ------------------------------------------------------------------ */
+    return NextResponse.json(
+        { message: "Event received but not handled" },
+        { status: 200 }
+    );
+}
