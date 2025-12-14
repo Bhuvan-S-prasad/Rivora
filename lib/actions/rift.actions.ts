@@ -1,6 +1,6 @@
 "use server";
 
-import { FilterQuery, SortOrder } from "mongoose";
+import { QueryFilter, SortOrder } from "mongoose";
 
 import Echo from "../models/echo.models";
 import User from "../models/user.models";
@@ -123,7 +123,7 @@ export async function fetchRifts({
         const regex = new RegExp(searchString, "i");
 
         // Create an initial query object to filter rifts.
-        const query: FilterQuery<typeof Rift> = {};
+        const query: QueryFilter<typeof Rift> = {};
 
         // If the search string is not empty, add the $or operator to match either username or name fields.
         if (searchString.trim() !== "") {

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import User from "../models/user.models";
 import { connectToDB } from "../mongoose";
 import Echo from "../models/echo.models";
-import mongoose, { SortOrder } from "mongoose";
+import { QueryFilter, SortOrder } from "mongoose";
 
 
 interface Params {
@@ -114,7 +114,7 @@ export async function fetchUsers({
 
         const regex = new RegExp(searchString, "i");
 
-        const query: mongoose.FilterQuery<typeof User> = {
+        const query: QueryFilter<typeof User> = {
             id: { $ne: userId },
         }
 
