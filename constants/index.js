@@ -1,4 +1,4 @@
-import { Heart, HomeIcon, MessageCirclePlusIcon, SearchIcon, Tag, UserRound, Users, UsersIcon } from "lucide-react";
+import { GitPullRequestClosed, Heart, HomeIcon, MessageCirclePlusIcon, SearchIcon, Tag, UserRound, Users, UsersIcon } from "lucide-react";
 
 export const sidebarLinks = [
     {
@@ -38,3 +38,9 @@ export const profileTabs = [
     { value: "replies", label: "Replies", icon: <Users /> },
     { value: "tagged", label: "Tagged", icon: <Tag /> },
 ];
+
+export const riftTabs = [
+    { value: "echos", label: "Echos", icon: <MessageCirclePlusIcon /> },
+    { value: "members", label: "Members", icon: <Users /> },
+    { value: "requests", label: "Requests", icon: <GitPullRequestClosed /> },
+]

@@ -2,16 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, MessageCircle, Repeat, Share2 } from "lucide-react";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 import { formatTimeAgo } from "@/lib/utils";
-import { usePathname } from "next/navigation";
 import { toggleLikeEcho } from "@/lib/actions/echo.actions";
 
-// Add useState to imports
-import { useState } from "react";
-
-// Update Props
 interface Props {
     id: string;
     currentUserId: string;
@@ -21,12 +18,12 @@ interface Props {
         name: string;
         image: string;
         id: string;
-    }
+    };
     rift: {
         id: string;
         name: string;
         image: string;
-    } | null
+    } | null;
     images: string[] | null;
     likes: string[];
     createdAt: Date;
@@ -38,7 +35,6 @@ interface Props {
 const EchoCard = ({
     id,
     currentUserId,
-    parentId,
     content,
     author,
     rift,
@@ -47,9 +43,7 @@ const EchoCard = ({
     createdAt,
     comments = [],
     isCommented,
-    hideReplyList,
 }: Props) => {
-    const [showReplies, setShowReplies] = useState(false);
     const pathname = usePathname();
     const isLiked = likes.includes(currentUserId);
 
@@ -57,124 +51,147 @@ const EchoCard = ({
         await toggleLikeEcho(id, currentUserId, pathname);
     };
 
-    console.log("Rift Prop:", rift);
-
     return (
-        <article className={`flex w-full flex-col ${isCommented ? 'px-0 xs:px-7 mb-4' : 'p-7 border-b border-gray-200'}`}> {/* Added mb-4 for spacing */}
-            <div className="flex items-start justify-between">
-                <div className="flex w-full flex-1 flex-row gap-4">
-                    <div className="flex flex-col items-center">
-                        <Link href={`/profile/${author?.id}`} className="relative h-11 w-11">
-                            <Image
-                                src={author?.image || '/assets/icons/user.svg'} // Fallback image
-                                alt="Profile Image"
-                                fill
-                                className="cursor-pointer rounded-full object-cover"
-                            />
+        <article
+            className={`flex w-full flex-col ${isCommented ? "px-0 xs:px-7 mb-4" : "p-7 border-b border-gray-200"
+                }`}
+        >
+            <div className="flex flex-row gap-4 min-w-0">
+                {/* Avatar */}
+                <Link href={`/profile/${author.id}`} className="relative h-11 w-11 shrink-0">
+                    <Image
+                        src={author.image || "/assets/icons/user.svg"}
+                        alt="Profile"
+                        fill
+                        className="rounded-full object-cover"
+                    />
+                </Link>
+
+                {/* Main Content */}
+                <div className="flex flex-col w-full min-w-0">
+                    {/* Header Row */}
+                    <div className="flex items-center gap-1 w-full">
+                        <Link href={`/profile/${author.id}`}>
+                            <h4 className="text-base-semibold text-dark-1 hover:underline">
+                                {author.name}
+                            </h4>
                         </Link>
+
+                        <span className="text-small-regular text-gray-500">·</span>
+
+                        <p
+                            className="text-small-regular text-gray-500"
+                            suppressHydrationWarning
+                        >
+                            {formatTimeAgo(createdAt)}
+                        </p>
+
+                        {/* Rift badge — FIXED */}
+                        {!isCommented && rift && (
+                            <Link
+                                href={`/rifts/${rift.id}`}
+                                className="ml-auto flex items-center gap-2 text-subtle-medium text-gray-400 hover:text-primary-500"
+                            >
+                                <span className="truncate max-w-[120px]">{rift.name}</span>
+                                <Image
+                                    src={rift.image}
+                                    alt={rift.name}
+                                    width={16}
+                                    height={16}
+                                    className="rounded-full object-cover"
+                                />
+                            </Link>
+                        )}
                     </div>
 
-                    <div className="flex w-full flex-col">
-                        <div className="flex items-center gap-1">
-                            <Link href={`/profile/${author?.id}`} className="w-fit">
-                                <h4 className="cursor-pointer text-base-semibold text-dark-1 hover:underline">
-                                    {author?.name || 'Unknown User'}
-                                </h4>
-                            </Link>
-                            <span className="text-small-regular text-gray-500">·</span>
-                            <p className="text-small-regular text-gray-500" suppressHydrationWarning>{formatTimeAgo(createdAt)}</p>
+                    {/* Content */}
+                    <Link href={`/echo/${id}`}>
+                        <p className="mt-2 text-small-regular text-dark-2 whitespace-pre-wrap">
+                            {(content || "").split(/(@\w+)/g).map((part, index) =>
+                                part.startsWith("@") ? (
+                                    <span
+                                        key={index}
+                                        className="text-primary-500 font-semibold mr-1"
+                                    >
+                                        {part}
+                                    </span>
+                                ) : (
+                                    <span key={index}>{part}</span>
+                                )
+                            )}
+                        </p>
+                    </Link>
+
+                    {/* Images */}
+                    {images && images.length > 0 && (
+                        <div
+                            className={`mt-4 ${images.length > 1
+                                ? "flex gap-3 overflow-x-auto no-scrollbar h-64"
+                                : ""
+                                }`}
+                        >
+                            {images.map((url, index) => (
+                                <div
+                                    key={index}
+                                    className={`relative rounded-xl overflow-hidden border border-light-4/20 ${images.length === 1
+                                        ? "w-full max-h-[500px]"
+                                        : "h-full shrink-0 bg-light-4/5"
+                                        }`}
+                                >
+                                    <img
+                                        src={url}
+                                        alt={`post-image-${index}`}
+                                        className={`${images.length === 1
+                                            ? "w-full h-auto object-contain"
+                                            : "h-full w-auto object-contain"
+                                            }`}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="mt-5 flex items-center gap-6">
+                        <div
+                            onClick={handleLike}
+                            className="flex items-center gap-2 cursor-pointer group"
+                        >
+                            <Heart
+                                className={`w-5 h-5 transition ${isLiked
+                                    ? "fill-red-500 text-red-500"
+                                    : "text-gray-1 group-hover:text-red-500"
+                                    }`}
+                            />
+                            {likes.length > 0 && (
+                                <span
+                                    className={`text-subtle-medium ${isLiked ? "text-red-500" : "text-gray-1"
+                                        }`}
+                                >
+                                    {likes.length}
+                                </span>
+                            )}
                         </div>
 
                         <Link href={`/echo/${id}`}>
-                            <p className="mt-2 text-small-regular text-dark-2 whitespace-pre-wrap">
-                                {(content || "").split(/(@\w+)/g).map((part, index) => (
-                                    part.startsWith('@') ? (
-                                        <span key={index} className="text-primary-500 font-semibold mr-1">{part}</span>
-                                    ) : (
-                                        <span key={index}>{part}</span>
-                                    )
-                                ))}
-                            </p>
+                            <div className="flex items-center gap-2 cursor-pointer group">
+                                <MessageCircle className="w-5 h-5 text-gray-1 group-hover:text-primary-500" />
+                                {comments.length > 0 && (
+                                    <span className="text-subtle-medium text-gray-1 group-hover:text-primary-500">
+                                        {comments.length}
+                                    </span>
+                                )}
+                            </div>
                         </Link>
 
-                        <div className="mt-5 flex flex-col gap-3">
-                            {images && images.length > 0 && (
-                                <div className={`w-full ${images.length > 1 ? 'flex overflow-x-auto no-scrollbar gap-3 h-64' : ''}`}>
-                                    {images.map((url, index) => (
-                                        <div
-                                            key={index}
-                                            className={`relative rounded-xl overflow-hidden group border border-light-4/20 ${images.length === 1
-                                                ? 'w-full h-auto max-h-[500px]'
-                                                : 'h-full w-auto shrink-0 flex items-center justify-center bg-light-4/5'
-                                                }`}
-                                        >
-                                            <img
-                                                src={url}
-                                                alt={`post-image-${index}`}
-                                                className={`${images.length === 1
-                                                    ? 'w-full h-auto max-h-[500px] object-contain'
-                                                    : 'h-full w-auto object-contain'
-                                                    }`}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                        <div className="flex items-center gap-2 cursor-pointer group">
+                            <Share2 className="w-5 h-5 text-gray-1 group-hover:text-blue" />
                         </div>
-
-                        <div className="mt-5 flex items-center gap-6">
-                            {/* Heart */}
-                            <div onClick={handleLike} className="flex gap-2 items-center group cursor-pointer">
-                                {isLiked ? (
-                                    <Heart className="w-5 h-5 fill-red-500 text-red-500" />
-                                ) : (
-                                    <Heart className="w-5 h-5 text-gray-1 group-hover:text-red-500 transition-colors" />
-                                )}
-                                {likes.length > 0 && (
-                                    <p className={`text-subtle-medium ${isLiked ? 'text-red-500' : 'text-gray-1 group-hover:text-red-500'}`}>
-                                        {likes.length}
-                                    </p>
-                                )}
-                            </div>
-
-                            {/* Reply */}
-                            <Link href={`/echo/${id}`}>
-                                <div className="flex gap-2 items-center group cursor-pointer">
-                                    <MessageCircle className="w-5 h-5 text-gray-1 group-hover:text-primary-500 transition-colors" />
-                                    {comments.length > 0 && (
-                                        <p className="text-subtle-medium text-gray-1 group-hover:text-primary-500">
-                                            {comments.length}
-                                        </p>
-                                    )}
-                                </div>
-                            </Link>
-
-                            <div className="flex gap-2 items-center group cursor-pointer">
-                                <Share2 className="w-5 h-5 text-gray-1 group-hover:text-blue transition-colors" />
-                            </div>
-
-                            {isCommented && comments && comments.length > 0 && (
-                                <Link href={`/echo/${id}`} className="flex gap-2 items-center group cursor-pointer">
-                                    <p className="mt-1 text-subtle-medium text-gray-400">{comments.length} replies</p>
-                                </Link>
-                            )}
-                        </div>
-
                     </div>
                 </div>
-
-
-                {!isCommented && rift && (
-                    <div className="mt-4 w-full">
-                        <Link href={`/rift/${rift.id}`} className="flex items-center gap-2 group cursor-pointer w-fit">
-                            <p className="text-subtle-medium text-gray-400 group-hover:text-primary-500">{rift.name}</p>
-                            <Image src={rift.image} alt={rift.name} width={16} height={16} className="rounded-full object-cover" />
-                        </Link>
-                    </div>
-                )}
             </div>
         </article>
     );
-}
+};
 
 export default EchoCard;
