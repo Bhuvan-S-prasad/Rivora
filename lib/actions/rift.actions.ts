@@ -172,7 +172,8 @@ export async function fetchRifts({
             .sort(sortOptions)
             .skip(skipAmount)
             .limit(pageSize)
-            .populate("members");
+            .populate("members")
+            .lean();
 
         // Count the total number of communities that match the search criteria (without pagination).
         const totalCommunitiesCount = await Rift.countDocuments(query);
@@ -182,7 +183,7 @@ export async function fetchRifts({
         // Check if there are more communities beyond the current page.
         const isNext = totalCommunitiesCount > skipAmount + rifts.length;
 
-        return { rifts, isNext };
+        return { rifts: JSON.parse(JSON.stringify(rifts)), isNext };
     } catch (error) {
         console.error("Error fetching communities:", error);
         throw error;
