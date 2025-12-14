@@ -61,7 +61,7 @@ export async function fetchRiftDetails(id: string) {
             },
         ]);
 
-        return riftDetails;
+        return JSON.parse(JSON.stringify(riftDetails));
     } catch (error) {
         // Handle any errors
         console.error("Error fetching rift details:", error);
@@ -73,14 +73,14 @@ export async function fetchRiftPosts(id: string) {
     try {
         connectToDB();
 
-        const riftPosts = await Rift.findById(id).populate({
+        const riftPosts = await Rift.findOne({ id }).populate({
             path: "echos",
             model: Echo,
             populate: [
                 {
                     path: "author",
                     model: User,
-                    select: "name image id", // Select the "name" and "_id" fields from the "User" model
+                    select: "name image id _id",
                 },
                 {
                     path: "riftId",
@@ -93,26 +93,39 @@ export async function fetchRiftPosts(id: string) {
                     populate: {
                         path: "author",
                         model: User,
-                        select: "image _id", // Select the "name" and "_id" fields from the "User" model
+                        select: "image _id name id",
                     },
                 },
             ],
-        });
+        }).lean();
 
         if (!riftPosts) {
             return null;
         }
 
-        const riftPostsWithTransformedEchoes = {
-            ...riftPosts.toObject(),
-            echoes: riftPosts.echoes.map((echo: any) => ({
-                ...echo,
-                rift: echo.riftId,
-                likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.toString() : like) : []
-            }))
+        // Transform echos to ensure proper serialization
+        const transformedEchos = (riftPosts.echos || []).map((echo: any) => ({
+            ...echo,
+            _id: echo._id?.toString() || echo._id,
+            rift: echo.riftId,
+            author: echo.author ? {
+                ...echo.author,
+                _id: echo.author._id?.toString() || echo.author._id,
+            } : null,
+            likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.toString() : like) : [],
+            children: (echo.children || []).map((child: any) => ({
+                ...child,
+                _id: child._id?.toString() || child._id,
+            })),
+            createdAt: echo.createdAt,
+        }));
+
+        const result = {
+            ...riftPosts,
+            echos: transformedEchos,
         };
 
-        return riftPostsWithTransformedEchoes;
+        return JSON.parse(JSON.stringify(result));
     } catch (error) {
         // Handle any errors
         console.error("Error fetching rift posts:", error);
@@ -159,7 +172,8 @@ export async function fetchRifts({
             .sort(sortOptions)
             .skip(skipAmount)
             .limit(pageSize)
-            .populate("members");
+            .populate("members")
+            .lean();
 
         // Count the total number of communities that match the search criteria (without pagination).
         const totalCommunitiesCount = await Rift.countDocuments(query);
@@ -169,7 +183,7 @@ export async function fetchRifts({
         // Check if there are more communities beyond the current page.
         const isNext = totalCommunitiesCount > skipAmount + rifts.length;
 
-        return { rifts, isNext };
+        return { rifts: JSON.parse(JSON.stringify(rifts)), isNext };
     } catch (error) {
         console.error("Error fetching communities:", error);
         throw error;
