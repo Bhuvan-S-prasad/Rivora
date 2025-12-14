@@ -2,6 +2,7 @@
 
 import Echo from "../models/echo.models";
 import User from "../models/user.models";
+import Rift from "../models/rift.models";
 import { connectToDB } from "../mongoose";
 import { revalidatePath } from "next/cache";
 
@@ -18,16 +19,28 @@ export async function createEcho({ text, author, riftId, images, path }: Params)
     try {
         connectToDB();
 
+        const riftIdObject = await Rift.findOne(
+            { id: riftId },
+            { _id: 1 }
+        )
+
         const createEcho = await Echo.create({
             text,
             author,
-            riftId: null,
+            riftId: riftIdObject,
             images,
         });
+
 
         await User.findByIdAndUpdate(author, {
             $push: { echos: createEcho._id }
         });
+
+        if (riftIdObject) {
+            await Rift.findByIdAndUpdate(riftIdObject._id, {
+                $push: { echos: createEcho._id }
+            });
+        }
 
         revalidatePath(path);
     }
@@ -47,6 +60,11 @@ export async function fetchEchoes(pageNumber = 1, pageSize = 20) {
         .limit(pageSize)
         .populate({ path: 'author', model: User })
         .populate({
+            path: 'riftId',
+            model: Rift,
+            select: "_id id name image"
+        })
+        .populate({
             path: 'children',
             populate: {
                 path: 'author',
@@ -62,6 +80,7 @@ export async function fetchEchoes(pageNumber = 1, pageSize = 20) {
     // Transform likes to maintain compatibility with frontend which expects string[]
     const echosWithTransformedLikes = echos.map((echo: any) => ({
         ...echo,
+        rift: echo.riftId,
         likes: echo.likes.map((like: any) => like.userId ? like.userId.toString() : like)
     }));
 
@@ -82,6 +101,11 @@ export async function fetchEchoById(id: string) {
             .populate({
                 path: 'author',
                 model: User,
+                select: "_id id name image"
+            })
+            .populate({
+                path: 'riftId',
+                model: Rift,
                 select: "_id id name image"
             })
             .populate({
@@ -118,6 +142,11 @@ export async function fetchEchoById(id: string) {
         // Transform likes for compatibility
         if (echo.likes) {
             echo.likes = echo.likes.map((like: any) => like.userId ? like.userId.toString() : like);
+        }
+
+        // Map riftId to rift
+        if (echo.riftId) {
+            echo.rift = echo.riftId;
         }
 
         return JSON.parse(JSON.stringify(echo));

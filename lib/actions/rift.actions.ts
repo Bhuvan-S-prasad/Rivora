@@ -83,6 +83,11 @@ export async function fetchRiftPosts(id: string) {
                     select: "name image id", // Select the "name" and "_id" fields from the "User" model
                 },
                 {
+                    path: "riftId",
+                    model: Rift,
+                    select: "_id id name image"
+                },
+                {
                     path: "children",
                     model: Echo,
                     populate: {
@@ -94,7 +99,20 @@ export async function fetchRiftPosts(id: string) {
             ],
         });
 
-        return riftPosts;
+        if (!riftPosts) {
+            return null;
+        }
+
+        const riftPostsWithTransformedEchoes = {
+            ...riftPosts.toObject(),
+            echoes: riftPosts.echoes.map((echo: any) => ({
+                ...echo,
+                rift: echo.riftId,
+                likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.toString() : like) : []
+            }))
+        };
+
+        return riftPostsWithTransformedEchoes;
     } catch (error) {
         // Handle any errors
         console.error("Error fetching rift posts:", error);

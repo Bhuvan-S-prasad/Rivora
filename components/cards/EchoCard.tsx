@@ -30,7 +30,7 @@ interface Props {
     images: string[] | null;
     likes: string[];
     createdAt: Date;
-    comments: any[]; 
+    comments: any[];
     isCommented?: boolean;
     hideReplyList?: boolean;
 }
@@ -56,6 +56,8 @@ const EchoCard = ({
     const handleLike = async () => {
         await toggleLikeEcho(id, currentUserId, pathname);
     };
+
+    console.log("Rift Prop:", rift);
 
     return (
         <article className={`flex w-full flex-col ${isCommented ? 'px-0 xs:px-7 mb-4' : 'p-7 border-b border-gray-200'}`}> {/* Added mb-4 for spacing */}
@@ -160,6 +162,16 @@ const EchoCard = ({
 
                     </div>
                 </div>
+
+
+                {!isCommented && rift && (
+                    <div className="mt-4 w-full">
+                        <Link href={`/rift/${rift.id}`} className="flex items-center gap-2 group cursor-pointer w-fit">
+                            <p className="text-subtle-medium text-gray-400 group-hover:text-primary-500">{rift.name}</p>
+                            <Image src={rift.image} alt={rift.name} width={16} height={16} className="rounded-full object-cover" />
+                        </Link>
+                    </div>
+                )}
             </div>
         </article>
     );

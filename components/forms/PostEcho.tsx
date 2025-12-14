@@ -19,6 +19,7 @@ import { createEcho } from '@/lib/actions/echo.actions';
 import { useUploadThing } from '@/lib/uploadthing';
 import { Image as ImageIcon, X } from 'lucide-react';
 import Image from 'next/image';
+import { useOrganization } from '@clerk/nextjs';
 
 interface Props {
     userId: string;
@@ -35,6 +36,7 @@ function PostEcho({ userId, userImage, name, username }: Props) {
     const [fileUrls, setFileUrls] = useState<string[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { startUpload } = useUploadThing("media");
+    const { organization } = useOrganization();
 
     const form = useForm({
         resolver: zodResolver(echoValidation),
@@ -81,6 +83,7 @@ function PostEcho({ userId, userImage, name, username }: Props) {
     }
 
     const onSubmit = async (values: z.infer<typeof echoValidation>) => {
+        
         let uploadedImageUrls: string[] = [];
 
         if (files.length > 0) {
@@ -90,10 +93,12 @@ function PostEcho({ userId, userImage, name, username }: Props) {
             }
         }
 
+        
+
         await createEcho({
             text: values.echo,
             author: userId,
-            riftId: null,
+            riftId: organization ? organization.id : null,
             images: uploadedImageUrls.length > 0 ? uploadedImageUrls : null,
             path: pathname,
         });

@@ -5,7 +5,7 @@ import User from "../models/user.models";
 import { connectToDB } from "../mongoose";
 import Echo from "../models/echo.models";
 import { QueryFilter, SortOrder } from "mongoose";
-
+import Rift from "../models/rift.models";
 
 interface Params {
     userId: string;
@@ -71,23 +71,40 @@ export async function fetchUserPosts(userId: string) {
     try {
         connectToDB();
 
-        const echoes = await User.findOne({ id: userId })
+        const user = await User.findOne({ id: userId })
             .populate({
                 path: "echos",
                 model: Echo,
-                populate: {
-                    path: 'children',
-                    model: Echo,
-                    populate: {
-                        path: 'author',
-                        model: User,
-                        select: 'name image id _id'
+                populate: [
+                    {
+                        path: "riftId",
+                        model: Rift,
+                        select: "_id id name image"
+                    },
+                    {
+                        path: 'children',
+                        model: Echo,
+                        populate: {
+                            path: 'author',
+                            model: User,
+                            select: 'name image id _id'
+                        }
                     }
-                }
+                ]
             })
             .lean();
 
-        return JSON.parse(JSON.stringify(echoes));
+        if (!user) {
+            return null;
+        }
+
+        user.echos = user.echos.map((echo: any) => ({
+            ...echo,
+            rift: echo.riftId,
+            likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.toString() : like) : []
+        }));
+
+        return JSON.parse(JSON.stringify(user));
     }
     catch (error: any) {
         throw new Error(`Failed to fetch user posts: ${error}`);
