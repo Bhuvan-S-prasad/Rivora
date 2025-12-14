@@ -54,9 +54,6 @@ export async function POST(request: Request) {
         );
     }
 
-    /* ------------------------------------------------------------------ */
-    /* 3. Verify webhook signature                                        */
-    /* ------------------------------------------------------------------ */
     const webhookSecret = process.env.NEXT_CLERK_WEBHOOK_SECRET;
 
     if (!webhookSecret) {

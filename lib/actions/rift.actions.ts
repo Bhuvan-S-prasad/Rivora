@@ -37,7 +37,7 @@ export async function createRift(
         const createdRift = await newRift.save();
 
         // Update User model
-        user.communities.push(createdRift._id);
+        user.rifts.push(createdRift._id);
         await user.save();
 
         return createdRift;
@@ -74,7 +74,7 @@ export async function fetchRiftPosts(id: string) {
         connectToDB();
 
         const riftPosts = await Rift.findById(id).populate({
-            path: "echoes",
+            path: "echos",
             model: Echo,
             populate: [
                 {
@@ -207,7 +207,7 @@ export async function addMemberToRift(
         await rift.save();
 
         // Add the rift's _id to the communities array in the user
-        user.communities.push(rift._id);
+        user.rifts.push(rift._id);
         await user.save();
 
         return rift;
@@ -244,10 +244,10 @@ export async function removeUserFromRift(
             { $pull: { members: userIdObject._id } }
         );
 
-        // Remove the rift's _id from the communities array in the user
+        // Remove the rift's _id from the rifts array in the user
         await User.updateOne(
             { _id: userIdObject._id },
-            { $pull: { communities: riftIdObject._id } }
+            { $pull: { rifts: riftIdObject._id } }
         );
 
         return { success: true };
@@ -295,18 +295,20 @@ export async function deleteRift(riftId: string) {
         });
 
         if (!deletedRift) {
-            throw new Error("Rift not found");
+            // Rift may have already been deleted or never existed in our DB
+            console.log(`Rift with id ${riftId} not found, skipping deletion`);
+            return null;
         }
 
-        // Delete all Echo associated with the rift
-        await Echo.deleteMany({ rift: riftId });
+        // Delete all Echoes associated with the rift using MongoDB ObjectId
+        await Echo.deleteMany({ riftId: deletedRift._id });
 
-        // Find all users who are part of the rift
-        const riftUsers = await User.find({ communities: riftId });
+        // Find all users who are part of the rift using MongoDB ObjectId
+        const riftUsers = await User.find({ rifts: deletedRift._id });
 
         // Remove the rift from the 'communities' array for each user
         const updateUserPromises = riftUsers.map((user) => {
-            user.communities.pull(riftId);
+            user.rifts.pull(deletedRift._id);
             return user.save();
         });
 
