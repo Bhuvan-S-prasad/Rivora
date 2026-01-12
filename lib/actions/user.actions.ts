@@ -243,7 +243,37 @@ export async function getActivity(userId: string) {
             _id: reply._id
         }));
 
-        const activity = [...repliesActivity, ...hydratedLikes].sort((a, b) => {
+        // Get follow activity - fetch user's followers with timestamps
+        const currentUser = await User.findOne({ _id: userId });
+        let followsActivity: any[] = [];
+
+        if (currentUser && currentUser.followers && currentUser.followers.length > 0) {
+            // Get follower user details
+            const followerIds = currentUser.followers.map((f: any) => f.userId || f);
+            const followerUsers = await User.find({ _id: { $in: followerIds } }).select("name image id _id");
+            const followerMap = new Map(followerUsers.map((user: any) => [user._id.toString(), user]));
+
+            followsActivity = currentUser.followers
+                .filter((f: any) => f.userId) // Only include new format followers with timestamps
+                .map((follower: any) => {
+                    const user = followerMap.get(follower.userId.toString());
+                    if (!user) return null;
+                    return {
+                        type: 'follow',
+                        author: {
+                            name: user.name,
+                            image: user.image,
+                            id: user.id,
+                            _id: user._id
+                        },
+                        createdAt: follower.createdAt,
+                        _id: `follow-${follower.userId}-${follower.createdAt}`
+                    };
+                })
+                .filter((item: any) => item !== null);
+        }
+
+        const activity = [...repliesActivity, ...hydratedLikes, ...followsActivity].sort((a, b) => {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
@@ -252,5 +282,167 @@ export async function getActivity(userId: string) {
     } catch (error) {
         console.error("Error fetching activity:", error);
         throw new Error(`Failed to fetch activity: ${error}`);
+    }
+}
+
+// Follow a user
+export async function followUser(currentUserId: string, targetUserId: string) {
+    try {
+        await connectToDB();
+
+        // Get both users by their clerk id
+        const currentUser = await User.findOne({ id: currentUserId });
+        const targetUser = await User.findOne({ id: targetUserId });
+
+        if (!currentUser || !targetUser) {
+            throw new Error("User not found");
+        }
+
+        // Check if already following (handle undefined following array for existing users)
+        const followingArray = currentUser.following || [];
+        if (followingArray.some((id: any) => id.toString() === targetUser._id.toString())) {
+            return { success: false, message: "Already following this user" };
+        }
+
+        // Add target to current user's following
+        await User.findByIdAndUpdate(currentUser._id, {
+            $addToSet: { following: targetUser._id }
+        });
+
+        // Add current user to target's followers (with timestamp for activity)
+        await User.findByIdAndUpdate(targetUser._id, {
+            $push: { followers: { userId: currentUser._id, createdAt: new Date() } }
+        });
+
+        revalidatePath(`/profile/${targetUserId}`);
+        revalidatePath(`/profile/${currentUserId}`);
+
+        return { success: true, message: "Successfully followed user" };
+    } catch (error) {
+        console.error("Error following user:", error);
+        throw new Error(`Failed to follow user: ${error}`);
+    }
+}
+
+// Unfollow a user
+export async function unfollowUser(currentUserId: string, targetUserId: string) {
+    try {
+        await connectToDB();
+
+        const currentUser = await User.findOne({ id: currentUserId });
+        const targetUser = await User.findOne({ id: targetUserId });
+
+        if (!currentUser || !targetUser) {
+            throw new Error("User not found");
+        }
+
+        // Remove target from current user's following
+        await User.findByIdAndUpdate(currentUser._id, {
+            $pull: { following: targetUser._id }
+        });
+
+        // Remove current user from target's followers
+        await User.findByIdAndUpdate(targetUser._id, {
+            $pull: { followers: { userId: currentUser._id } }
+        });
+
+        revalidatePath(`/profile/${targetUserId}`);
+        revalidatePath(`/profile/${currentUserId}`);
+
+        return { success: true, message: "Successfully unfollowed user" };
+    } catch (error) {
+        console.error("Error unfollowing user:", error);
+        throw new Error(`Failed to unfollow user: ${error}`);
+    }
+}
+
+// Check if a user is following another user
+export async function checkIsFollowing(currentUserId: string, targetUserId: string) {
+    try {
+        await connectToDB();
+
+        const currentUser = await User.findOne({ id: currentUserId });
+        const targetUser = await User.findOne({ id: targetUserId });
+
+        if (!currentUser || !targetUser) {
+            return false;
+        }
+
+        // Handle undefined following array for existing users
+        const followingArray = currentUser.following || [];
+        return followingArray.some((id: any) => id.toString() === targetUser._id.toString());
+    } catch (error) {
+        console.error("Error checking follow status:", error);
+        return false;
+    }
+}
+
+// Get a user's following list
+export async function getFollowing(userId: string) {
+    try {
+        await connectToDB();
+
+        const user = await User.findOne({ id: userId });
+
+        if (!user || !user.following || user.following.length === 0) {
+            return [];
+        }
+
+        // Manually fetch the followed users to avoid strictPopulate issues
+        const followingUsers = await User.find({
+            _id: { $in: user.following }
+        }).select("_id id name username image");
+
+        return JSON.parse(JSON.stringify(followingUsers));
+    } catch (error) {
+        console.error("Error fetching following:", error);
+        throw new Error(`Failed to fetch following list: ${error}`);
+    }
+}
+
+// Get a user's followers list
+export async function getFollowers(userId: string) {
+    try {
+        await connectToDB();
+
+        const user = await User.findOne({ id: userId });
+
+        if (!user || !user.followers || user.followers.length === 0) {
+            return [];
+        }
+
+        // Extract user IDs from followers (handle both old and new format)
+        const followerIds = user.followers.map((f: any) => f.userId || f);
+
+        // Manually fetch the follower users to avoid strictPopulate issues
+        const followerUsers = await User.find({
+            _id: { $in: followerIds }
+        }).select("_id id name username image");
+
+        return JSON.parse(JSON.stringify(followerUsers));
+    } catch (error) {
+        console.error("Error fetching followers:", error);
+        throw new Error(`Failed to fetch followers list: ${error}`);
+    }
+}
+
+// Get follow counts for a user
+export async function getFollowCounts(userId: string) {
+    try {
+        await connectToDB();
+
+        const user = await User.findOne({ id: userId });
+
+        if (!user) {
+            return { followingCount: 0, followersCount: 0 };
+        }
+
+        return {
+            followingCount: user.following?.length || 0,
+            followersCount: user.followers?.length || 0
+        };
+    } catch (error) {
+        console.error("Error fetching follow counts:", error);
+        return { followingCount: 0, followersCount: 0 };
     }
 }

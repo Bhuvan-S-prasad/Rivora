@@ -23,17 +23,7 @@ export default function RootLayout({
                 <body className={inter.className}>
                     <div className="w-full flex justify-center items-center min-h-screen">
                         <header className="flex justify-center items-center p-4 gap-4 h-16">
-                            <SignedOut>
-                                <SignInButton />
-                                <SignUpButton>
-                                    <button className="bg-[#07aafc] text-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer">
-                                        Sign Up
-                                    </button>
-                                </SignUpButton>
-                            </SignedOut>
-                            <SignedIn>
-                                <UserButton />
-                            </SignedIn>
+
                         </header>
                         {children}
                     </div>

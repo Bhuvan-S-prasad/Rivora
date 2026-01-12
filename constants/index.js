@@ -36,7 +36,6 @@ export const sidebarLinks = [
 export const profileTabs = [
     { value: "echos", label: "Echos", icon: <MessageCirclePlusIcon /> },
     { value: "replies", label: "Replies", icon: <Users /> },
-    { value: "tagged", label: "Tagged", icon: <Tag /> },
 ];
 
 export const riftTabs = [

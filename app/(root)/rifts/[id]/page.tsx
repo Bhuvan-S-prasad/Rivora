@@ -1,4 +1,5 @@
 import UserCard from "@/components/cards/UserCard";
+import RequestCard from "@/components/cards/RequestCard";
 import EchoesTab from "@/components/shared/EchoesTab";
 import ProfileHeader from "@/components/shared/ProfileHeader";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -79,11 +80,22 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
                         </TabsContent>
 
                         <TabsContent value="requests" className="w-full">
-                            <EchoesTab
-                                currentUserId={user.id}
-                                accountId={riftDetails.id}
-                                accountType="Rift"
-                            />
+                            <section className="mt-9 flex flex-col gap-4">
+                                {(!riftDetails?.requests || riftDetails.requests.length === 0) ? (
+                                    <p className="no-result p-4">No pending requests</p>
+                                ) : (
+                                    riftDetails.requests.map((request: any) => (
+                                        <RequestCard
+                                            key={request.userId?._id || request._id || Math.random()}
+                                            riftId={riftDetails.id}
+                                            userId={request.userId?.id || ""}
+                                            name={request.userId?.name || "Unknown"}
+                                            username={request.userId?.username || "unknown"}
+                                            image={request.userId?.image || "/assets/profile.svg"}
+                                        />
+                                    ))
+                                )}
+                            </section>
                         </TabsContent>
                     </Tabs>
 

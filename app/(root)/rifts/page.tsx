@@ -39,7 +39,9 @@ async function Page({
                                     username={rift.username}
                                     image={rift.image}
                                     bio={rift.bio}
-                                    members={rift.members}
+                                    members={rift.members || []}
+                                    requests={rift.requests || []}
+                                    currentUserId={user.id}
                                 />
                             </Link>
                         ))}

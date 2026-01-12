@@ -1,5 +1,5 @@
 import UserCard from "@/components/cards/UserCard";
-import { fetchUser, fetchUsers } from "@/lib/actions/user.actions";
+import { fetchUser, fetchUsers, checkIsFollowing } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -21,24 +21,35 @@ async function Page() {
         pageSize: 20
     })
 
+    // Get follow status for each user
+    const usersWithFollowStatus = await Promise.all(
+        result.users.map(async (person: { _id: string; id: string; name: string; username: string; image: string }) => {
+            const isFollowing = await checkIsFollowing(user.id, person.id);
+            return { ...person, isFollowing };
+        })
+    );
+
     return (
 
 
         <div className="flex flex-col">
             <div className="bg-white rounded-t-2xl border-x border-t border-b-0 border-gray-200 overflow-hidden">
-                {result.users.length === 0 ? (
+                {usersWithFollowStatus.length === 0 ? (
                     <p className="no-result">No user</p>
 
                 ) : (
                     <>
-                        {result.users.map((person: { _id: string; id: string; name: string; username: string; image: string }) => (
+                        {usersWithFollowStatus.map((person) => (
                             <Link href={`/profile/${person.id}`} key={person.id}>
                                 <UserCard
                                     id={person.id}
                                     name={person.name}
                                     username={person.username}
                                     image={person.image}
-                                    personType="User" />
+                                    personType="User"
+                                    currentUserId={user.id}
+                                    isFollowing={person.isFollowing}
+                                />
                             </Link>
                         ))}
                     </>

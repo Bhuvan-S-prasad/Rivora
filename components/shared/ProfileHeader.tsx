@@ -1,5 +1,10 @@
+"use client";
+
 import Image from "next/image";
-import { Button } from "../ui/button";
+import FollowButton from "./FollowButton";
+import { useState } from "react";
+import FollowersList from "./FollowersList";
+import FollowingList from "./FollowingList";
 
 interface Props {
     accountId: string;
@@ -8,7 +13,10 @@ interface Props {
     username: string;
     image: string;
     bio: string;
-    type?: 'User' | 'Rift'
+    type?: 'User' | 'Rift';
+    isFollowing?: boolean;
+    followersCount?: number;
+    followingCount?: number;
 }
 
 
@@ -19,8 +27,15 @@ const ProfileHeader = ({
     username,
     image,
     bio,
-    type
+    type,
+    isFollowing = false,
+    followersCount = 0,
+    followingCount = 0
 }: Props) => {
+    const [showFollowingList, setShowFollowingList] = useState(false);
+    const [showFollowersList, setShowFollowersList] = useState(false);
+    const isOwnProfile = accountId === authUserId;
+
     return (
         <div className="flex w-full flex-col justify-start p-4">
             <div className="flex justify-between">
@@ -42,17 +57,47 @@ const ProfileHeader = ({
                 </div>
             </div>
 
-            {/* change after adding follow and unfollow functionality */}
+            {type !== "Rift" && (
+                <div className="mt-5 flex items-center gap-5">
+                    {!isOwnProfile && (
+                        <FollowButton
+                            currentUserId={authUserId}
+                            targetUserId={accountId}
+                            isFollowing={isFollowing}
+                        />
+                    )}
+                    <button
+                        onClick={() => setShowFollowersList(true)}
+                        className="text-base-medium text-gray-400 hover:text-primary-500 transition-colors cursor-pointer"
+                    >
+                        <span className="text-base-semibold mr-1 text-dark-1">{followersCount}</span>
+                        followers
+                    </button>
+                    <button
+                        onClick={() => setShowFollowingList(true)}
+                        className="text-base-medium text-gray-400 hover:text-primary-500 transition-colors cursor-pointer"
+                    >
+                        <span className="text-base-semibold mr-1 text-dark-1">{followingCount}</span>
+                        following
+                    </button>
+                </div>
+            )}
 
-            <div className="mt-5 flex items-center gap-5">
-                <Button className="min-w-[74px] rounded-lg bg-primary-500 px-4 py-2 text-small-regular text-light-1">
-                    Follow
-                </Button>
-                <p className="text-base-medium text-gray-400">
-                    <span className="text-base-semibold mr-1">12</span>
-                    followers
-                </p>
-            </div>
+            {showFollowersList && (
+                <FollowersList
+                    userId={accountId}
+                    currentUserId={authUserId}
+                    onClose={() => setShowFollowersList(false)}
+                />
+            )}
+
+            {showFollowingList && (
+                <FollowingList
+                    userId={accountId}
+                    currentUserId={authUserId}
+                    onClose={() => setShowFollowingList(false)}
+                />
+            )}
 
             <div className="mt-12 h-0.5 w-full bg-dark-3" />
         </div>
