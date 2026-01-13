@@ -34,10 +34,10 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
                 <ProfileHeader
                     accountId={userInfo.id}
                     authUserId={user.id}
-                    name={userInfo.name}
-                    username={userInfo.username}
-                    image={userInfo.image}
-                    bio={userInfo.bio}
+                    name={userInfo.name || ""}
+                    username={userInfo.username || ""}
+                    image={userInfo.image || ""}
+                    bio={userInfo.bio || ""}
                     isFollowing={isFollowing}
                     followersCount={followersCount}
                     followingCount={followingCount}
