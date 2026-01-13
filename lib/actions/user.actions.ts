@@ -131,7 +131,7 @@ export async function fetchUsers({
 
         const regex = new RegExp(searchString, "i");
 
-        const query: QueryFilter<typeof User> = {
+        const query: any = {
             id: { $ne: userId },
         }
 

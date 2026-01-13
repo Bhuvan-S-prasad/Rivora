@@ -20,7 +20,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       <div className="bg-white rounded-t-2xl border-x border-t border-b-0 border-gray-200 overflow-hidden">
-        <PostEcho userId={userInfo._id.toString()} name={userInfo.name} username={userInfo.username} userImage={userInfo.image} />
+        <PostEcho userId={userInfo._id.toString()} name={userInfo.name || ""} username={userInfo.username || ""} userImage={userInfo.image || ""} />
 
         <section className="flex flex-col">
           {result.echos.length === 0 ? (

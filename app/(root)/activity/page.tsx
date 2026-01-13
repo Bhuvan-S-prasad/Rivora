@@ -14,7 +14,7 @@ async function Page() {
 
     if (!userInfo?.onboarded) redirect('/onboarding');
 
-    const activity = await getActivity(userInfo._id);
+    const activity = await getActivity(userInfo._id.toString());
 
     return (
         <section>

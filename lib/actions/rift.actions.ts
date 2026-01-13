@@ -330,16 +330,11 @@ export async function deleteRift(riftId: string) {
         // Delete all Echoes associated with the rift using MongoDB ObjectId
         await Echo.deleteMany({ riftId: deletedRift._id });
 
-        // Find all users who are part of the rift using MongoDB ObjectId
-        const riftUsers = await User.find({ rifts: deletedRift._id });
-
         // Remove the rift from the 'communities' array for each user
-        const updateUserPromises = riftUsers.map((user) => {
-            user.rifts.pull(deletedRift._id);
-            return user.save();
-        });
-
-        await Promise.all(updateUserPromises);
+        await User.updateMany(
+            { rifts: deletedRift._id },
+            { $pull: { rifts: deletedRift._id } }
+        );
 
         return deletedRift;
     } catch (error) {
