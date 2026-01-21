@@ -2,12 +2,23 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { Heart, MessageCircle, Send, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { formatTimeAgo } from "@/lib/utils";
 import { toggleLikeEcho } from "@/lib/actions/echo.actions";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface Props {
     id: string;
@@ -46,10 +57,20 @@ const EchoCard = ({
 }: Props) => {
     const pathname = usePathname();
     const isLiked = likes.includes(currentUserId);
+    const [isCopied, setIsCopied] = useState(false);
 
     const handleLike = async () => {
         await toggleLikeEcho(id, currentUserId, pathname);
     };
+
+    const handleCopy = () => {
+        const shareUrl = `${window.location.origin}/echo/${id}`;
+        navigator.clipboard.writeText(shareUrl);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+    };
+
+    const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/echo/${id}` : '';
 
     return (
         <article
@@ -86,7 +107,7 @@ const EchoCard = ({
                             {formatTimeAgo(createdAt)}
                         </p>
 
-                        {/* Rift badge — FIXED */}
+                        {/* Rift badge */}
                         {!isCommented && rift && (
                             <Link
                                 href={`/rifts/${rift.id}`}
@@ -184,9 +205,49 @@ const EchoCard = ({
                             </div>
                         </Link>
 
-                        <div className="flex items-center gap-2 cursor-pointer group">
-                            <Share2 className="w-5 h-5 text-gray-1 group-hover:text-blue" />
-                        </div>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <div className="flex items-center gap-2 cursor-pointer group">
+                                    <Send className="w-5 h-5 text-gray-1 group-hover:text-blue-500" />
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md bg-white">
+                                <DialogHeader>
+                                    <DialogTitle>Share Echo</DialogTitle>
+                                    <DialogDescription>
+                                        Share this echo with your friends or copy the link below.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="flex items-center space-x-2">
+                                    <div className="grid flex-1 gap-2">
+                                        <Label htmlFor="link" className="sr-only">
+                                            Link
+                                        </Label>
+                                        <Input
+                                            id="link"
+                                            defaultValue={shareUrl}
+                                            readOnly
+                                            className="bg-gray-50 border-gray-200 text-dark-1 focus-visible:ring-offset-0 focus-visible:ring-1 focus-visible:ring-primary-500"
+                                        />
+                                    </div>
+                                    <Button type="button" size="sm" className="px-3 bg-primary-500 hover:bg-primary-500/90 text-white" onClick={handleCopy}>
+                                        <span className="sr-only">Copy</span>
+                                        {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                    </Button>
+                                </div>
+
+                                <div className="flex justify-end">
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        className="bg-gray-100 text-dark-1 hover:bg-gray-200"
+                                        onClick={handleCopy}
+                                    >
+                                        {isCopied ? "Copied" : "Copy Link"}
+                                    </Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
             </div>
