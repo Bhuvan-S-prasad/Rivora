@@ -1,8 +1,8 @@
 "use client"
 
 import Image from "next/image";
-import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import FollowButton from "../shared/FollowButton";
 
 interface Props {
     id: string;
@@ -10,13 +10,22 @@ interface Props {
     username: string;
     image: string;
     personType: string;
+    currentUserId?: string;
+    isFollowing?: boolean;
 }
 
-
-
-const UserCard = ({ id, name, username, image, personType }: Props) => {
+const UserCard = ({
+    id,
+    name,
+    username,
+    image,
+    personType,
+    currentUserId,
+    isFollowing = false
+}: Props) => {
 
     const router = useRouter()
+
     return (
         <article className="user-card p-5">
             <div className="relative h-12 w-12 shrink-0">
@@ -33,12 +42,21 @@ const UserCard = ({ id, name, username, image, personType }: Props) => {
                 <p className="text-small-medium">@{username}</p>
             </div>
 
-            <Button
-                className="user-card_btn"
-                onClick={() => router.push(`/profile/${id}`)}
-            >
-                Follow
-            </Button>
+            {currentUserId ? (
+                <FollowButton
+                    currentUserId={currentUserId}
+                    targetUserId={id}
+                    isFollowing={isFollowing}
+                    variant="compact"
+                />
+            ) : (
+                <button
+                    className="user-card_btn"
+                    onClick={() => router.push(`/profile/${id}`)}
+                >
+                    View
+                </button>
+            )}
 
         </article>
     )

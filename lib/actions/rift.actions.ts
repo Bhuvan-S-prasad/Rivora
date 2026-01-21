@@ -6,6 +6,7 @@ import Echo from "../models/echo.models";
 import User from "../models/user.models";
 import Rift from "../models/rift.models";
 import { connectToDB } from "../mongoose";
+import { revalidatePath } from "next/cache";
 
 export async function createRift(
     id: string,
@@ -58,6 +59,12 @@ export async function fetchRiftDetails(id: string) {
                 path: "members",
                 model: User,
                 select: "name username image _id id",
+            },
+            {
+                path: "requests.userId",
+                model: User,
+                select: "name username image _id id",
+                strictPopulate: false,
             },
         ]);
 
@@ -173,6 +180,12 @@ export async function fetchRifts({
             .skip(skipAmount)
             .limit(pageSize)
             .populate("members")
+            .populate({
+                path: "requests.userId",
+                model: User,
+                select: "name username image _id id",
+                strictPopulate: false,
+            })
             .lean();
 
         // Count the total number of communities that match the search criteria (without pagination).
@@ -317,20 +330,135 @@ export async function deleteRift(riftId: string) {
         // Delete all Echoes associated with the rift using MongoDB ObjectId
         await Echo.deleteMany({ riftId: deletedRift._id });
 
-        // Find all users who are part of the rift using MongoDB ObjectId
-        const riftUsers = await User.find({ rifts: deletedRift._id });
-
         // Remove the rift from the 'communities' array for each user
-        const updateUserPromises = riftUsers.map((user) => {
-            user.rifts.pull(deletedRift._id);
-            return user.save();
-        });
-
-        await Promise.all(updateUserPromises);
+        await User.updateMany(
+            { rifts: deletedRift._id },
+            { $pull: { rifts: deletedRift._id } }
+        );
 
         return deletedRift;
     } catch (error) {
         console.error("Error deleting rift: ", error);
+        throw error;
+    }
+}
+
+// Request to join a rift
+export async function requestToJoinRift(riftId: string, userId: string) {
+    try {
+        connectToDB();
+
+        const rift = await Rift.findOne({ id: riftId });
+        if (!rift) {
+            throw new Error("Rift not found");
+        }
+
+        const user = await User.findOne({ id: userId });
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        // Check if user is already a member
+        if (rift.members.includes(user._id)) {
+            throw new Error("User is already a member of this rift");
+        }
+
+        // Check if user already has a pending request
+        // Initialize requests array if it doesn't exist (for existing rifts)
+        if (!rift.requests) {
+            rift.requests = [];
+        }
+
+        const existingRequest = rift.requests.find(
+            (req: any) => req.userId?.toString() === user._id.toString()
+        );
+        if (existingRequest) {
+            throw new Error("Request already pending");
+        }
+
+        // Add the request
+        rift.requests.push({ userId: user._id, createdAt: new Date() });
+        await rift.save();
+
+        revalidatePath(`/rifts/${riftId}`);
+        revalidatePath('/rifts');
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error requesting to join rift:", error);
+        throw error;
+    }
+}
+
+// Approve a join request
+export async function approveJoinRequest(riftId: string, requesterId: string) {
+    try {
+        connectToDB();
+
+        const rift = await Rift.findOne({ id: riftId });
+        if (!rift) {
+            throw new Error("Rift not found");
+        }
+
+        const requester = await User.findOne({ id: requesterId });
+        if (!requester) {
+            throw new Error("Requester not found");
+        }
+
+        // Remove from requests
+        rift.requests = rift.requests.filter(
+            (req: any) => req.userId?.toString() !== requester._id.toString()
+        );
+
+        // Add to members
+        if (!rift.members.includes(requester._id)) {
+            rift.members.push(requester._id);
+        }
+        await rift.save();
+
+        // Add rift to user's rifts
+        if (!requester.rifts.includes(rift._id)) {
+            requester.rifts.push(rift._id);
+            await requester.save();
+        }
+
+        revalidatePath(`/rifts/${riftId}`);
+        revalidatePath('/rifts');
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error approving join request:", error);
+        throw error;
+    }
+}
+
+// Reject a join request
+export async function rejectJoinRequest(riftId: string, requesterId: string) {
+    try {
+        connectToDB();
+
+        const rift = await Rift.findOne({ id: riftId });
+        if (!rift) {
+            throw new Error("Rift not found");
+        }
+
+        const requester = await User.findOne({ id: requesterId });
+        if (!requester) {
+            throw new Error("Requester not found");
+        }
+
+        // Remove from requests
+        rift.requests = rift.requests.filter(
+            (req: any) => req.userId?.toString() !== requester._id.toString()
+        );
+        await rift.save();
+
+        revalidatePath(`/rifts/${riftId}`);
+        revalidatePath('/rifts');
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error rejecting join request:", error);
         throw error;
     }
 }

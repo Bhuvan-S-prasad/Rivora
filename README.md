@@ -1,5 +1,7 @@
 # RIVORA
-![logo](https://ik.imagekit.io/wq68aygdr/b_Design_a_simple,_min.png)
+<div align="center">
+  <img src="https://ik.imagekit.io/wq68aygdr/b_Design_a_simple,_min.png?tr=w-200,h-200,fo-center" width="200" height="200" alt="logo" style="border-radius: 50%; object-fit: cover; object-position: center;" />
+</div>
 
 Rivora is a modern, full-stack social media application designed to foster meaningful connections through threaded conversations and community-driven interactions. Built with performance and user experience at its core, Rivora allows users to share "Echoes", engage in deep discussions, and form communities known as "Rifts".
 

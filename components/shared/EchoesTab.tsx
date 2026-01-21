@@ -13,8 +13,9 @@ interface Props {
 const EchoesTab = async ({
     currentUserId,
     accountId,
-    accountType
-}: Props) => {
+    accountType,
+    tabType = "echos" // Default to echos
+}: Props & { tabType?: string }) => {
 
     let result: any;
 
@@ -28,9 +29,21 @@ const EchoesTab = async ({
 
     if (!result) redirect('/');
 
+    // Filter echoes based on tab type
+    const echoesToRender = (result.echos || []).filter((echo: any) => {
+        if (tabType === 'echos') {
+            // Show top-level posts (no parentId)
+            return !echo.parentId;
+        } else if (tabType === 'replies') {
+            // Show replies (has parentId)
+            return echo.parentId;
+        }
+        return true;
+    });
+
     return (
         <section className="mt-9 flex flex-col gap-10">
-            {(result.echos || []).map((echo: any) => (
+            {echoesToRender.map((echo: any) => (
                 <EchoCard
                     key={echo._id}
                     id={echo._id}

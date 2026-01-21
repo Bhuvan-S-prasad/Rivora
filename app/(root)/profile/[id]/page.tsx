@@ -2,7 +2,7 @@ import EchoesTab from "@/components/shared/EchoesTab";
 import ProfileHeader from "@/components/shared/ProfileHeader";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { profileTabs } from "@/constants";
-import { fetchUser } from "@/lib/actions/user.actions";
+import { fetchUser, checkIsFollowing, getFollowCounts } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
 import { TabsContent } from "@radix-ui/react-tabs";
 import Image from "next/image";
@@ -18,11 +18,15 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     const userInfo = await fetchUser(id);
-    console.log(userInfo);
+
 
     if (!userInfo) return null;
 
-    //if (!userInfo?.onboarded) redirect("/onboarding");
+    // Fetch follow status and counts
+    const isFollowing = await checkIsFollowing(user.id, id);
+    const { followersCount, followingCount } = await getFollowCounts(id);
+
+    if (!userInfo?.onboarded) redirect("/onboarding");
 
     return (
         <div className="flex flex-col">
@@ -30,10 +34,13 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
                 <ProfileHeader
                     accountId={userInfo.id}
                     authUserId={user.id}
-                    name={userInfo.name}
-                    username={userInfo.username}
-                    image={userInfo.image}
-                    bio={userInfo.bio}
+                    name={userInfo.name || ""}
+                    username={userInfo.username || ""}
+                    image={userInfo.image || ""}
+                    bio={userInfo.bio || ""}
+                    isFollowing={isFollowing}
+                    followersCount={followersCount}
+                    followingCount={followingCount}
                 />
 
                 <div className="mt-9">
@@ -50,7 +57,12 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
 
                                     {tab.label === 'Echos' && (
                                         <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 text-tiny-medium text-light-2">
-                                            {userInfo?.echos?.length}
+                                            {userInfo?.echos?.filter((e: any) => !e.parentId).length}
+                                        </p>
+                                    )}
+                                    {tab.label === 'Replies' && (
+                                        <p className="ml-1 rounded-sm bg-light-4 px-2 py-1 text-tiny-medium text-light-2">
+                                            {userInfo?.echos?.filter((e: any) => e.parentId).length}
                                         </p>
                                     )}
                                 </TabsTrigger>
@@ -63,6 +75,7 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
                                     currentUserId={user.id}
                                     accountId={userInfo.id}
                                     accountType="User"
+                                    tabType={tab.value}
                                 />
                             </TabsContent>
                         ))}

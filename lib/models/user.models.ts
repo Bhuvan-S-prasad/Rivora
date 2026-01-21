@@ -44,9 +44,32 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Rift'
         }
+    ],
+    following: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ],
+    followers: [
+        {
+            userId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            },
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
+        }
     ]
 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+// Delete cached model if it exists to ensure schema changes are picked up
+if (mongoose.models.User) {
+    delete mongoose.models.User;
+}
+
+const User = mongoose.model('User', userSchema);
 
 export default User;
