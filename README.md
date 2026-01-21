@@ -1,16 +1,16 @@
 # RIVORA
 <div align="center">
-  <img src="https://ik.imagekit.io/wq68aygdr/b_Design_a_simple,_min.png?tr=w-200,h-200,fo-center" width="200" height="200" alt="logo" style="border-radius: 50%; object-fit: cover; object-position: center;" />
+  <img src="https://ik.imagekit.io/wq68aygdr/b_Design_a_simple,_min.png?tr=w-200,h-200,fo-center,r-max" width="200" height="200" alt="logo" />
 </div>
 
-Rivora is a modern, full-stack social media application designed to foster meaningful connections through threaded conversations and community-driven interactions. Built with performance and user experience at its core, Rivora allows users to share "Echoes", engage in deep discussions, and form communities known as "Rifts".
+Rivora is a modern, full-stack social media application designed to foster meaningful connections through conversations and community-driven interactions. Built with performance and user experience at its core, Rivora allows users to share "Echoes", engage in deep discussions, and form communities known as "Rifts".
 
 ## Technical Architecture
 
 Rivora is built on a robust, scalable architecture leveraging the latest web technologies:
 
 *   **Framework**: **Next.js 16 (App Router)** serves as the backbone, utilizing React Server Components for efficient data fetching and server-side rendering.
-*   **Database**: **MongoDB** with **Mongoose** ORM provides a flexible document-oriented schema design, essential for handling complex relationship data like nested threads and user networks.
+*   **Database**: **MongoDB** with **Mongoose** ORM provides a flexible document-oriented schema design, essential for handling complex relationship data like comments and user networks.
 *   **Authentication**: Integrated **Clerk** middleware ensures secure, seamless user management and route protection.
 *   **Styling System**: **Tailwind CSS v4** combined with **Radix UI** primitives delivers a highly responsive, accessible, and theme-able interface.
 *   **File Storage**: **UploadThing** handles media assets, ensuring optimized image delivery for user profiles and content.
@@ -37,7 +37,7 @@ Rivora is built on a robust, scalable architecture leveraging the latest web tec
 
 ## Key Features
 
-*   **Echoes**: A flat-to-nested comment system allowing for structured replies and conversations.
+*   **Echoes**: A comment system allowing for structured replies and conversations.
 *   **Rifts**: Dedicated spaces for users to gather around shared interests.
 *   **Activity Feed**: Real-time aggregation of interactions, replies, and mentions.
 *   **User Profiles**: Fully customizable profiles with bios and media integration.
