@@ -5,6 +5,7 @@ import FollowButton from "./FollowButton";
 import { useState } from "react";
 import FollowersList from "./FollowersList";
 import FollowingList from "./FollowingList";
+import EditProfile from "./EditProfile";
 
 interface Props {
     accountId: string;
@@ -59,6 +60,9 @@ const ProfileHeader = ({
 
             {type !== "Rift" && (
                 <div className="mt-5 flex items-center gap-5">
+                    {isOwnProfile && (
+                        <EditProfile userId={authUserId} currentBio={bio} />
+                    )}
                     {!isOwnProfile && (
                         <FollowButton
                             currentUserId={authUserId}

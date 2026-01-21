@@ -446,3 +446,30 @@ export async function getFollowCounts(userId: string) {
         return { followingCount: 0, followersCount: 0 };
     }
 }
+
+export async function updateUserBio({
+    userId,
+    bio,
+    path
+}: {
+    userId: string;
+    bio: string;
+    path: string;
+}) {
+    try {
+        await connectToDB();
+
+        await User.findOneAndUpdate(
+            { id: userId },
+            { bio: bio }
+        );
+
+        if (path === '/profile/edit') {
+            revalidatePath(path);
+        } else { // Revalidate the profile page directly if path is provided
+            revalidatePath(path);
+        }
+    } catch (error: any) {
+        throw new Error(`Failed to update user bio: ${error.message}`);
+    }
+}

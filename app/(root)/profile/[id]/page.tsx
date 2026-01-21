@@ -26,7 +26,7 @@ async function Page({ params }: { params: Promise<{ id: string }> }) {
     const isFollowing = await checkIsFollowing(user.id, id);
     const { followersCount, followingCount } = await getFollowCounts(id);
 
-    //if (!userInfo?.onboarded) redirect("/onboarding");
+    if (!userInfo?.onboarded) redirect("/onboarding");
 
     return (
         <div className="flex flex-col">
