@@ -89,6 +89,11 @@ export async function fetchUserPosts(userId: string) {
                             model: User,
                             select: 'name image id _id'
                         }
+                    },
+                    {
+                        path: 'likes.userId',
+                        model: User,
+                        select: 'id'
                     }
                 ]
             })
@@ -101,7 +106,7 @@ export async function fetchUserPosts(userId: string) {
         user.echos = user.echos.map((echo: any) => ({
             ...echo,
             rift: echo.riftId,
-            likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.toString() : like) : []
+            likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.id : like) : []
         }));
 
         return JSON.parse(JSON.stringify(user));

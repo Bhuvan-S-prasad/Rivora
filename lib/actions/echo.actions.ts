@@ -72,6 +72,11 @@ export async function fetchEchoes(pageNumber = 1, pageSize = 20) {
                 select: "_id name parentId image"
             }
         })
+        .populate({
+            path: 'likes.userId',
+            model: User,
+            select: 'id'
+        })
 
     const totalPostsCount = await Echo.countDocuments({ parentId: { $in: [null, undefined] } })
 
@@ -81,7 +86,7 @@ export async function fetchEchoes(pageNumber = 1, pageSize = 20) {
     const echosWithTransformedLikes = echos.map((echo: any) => ({
         ...echo,
         rift: echo.riftId,
-        likes: echo.likes.map((like: any) => like.userId ? like.userId.toString() : like)
+        likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.id : like) : []
     }));
 
     const echosStringified = JSON.parse(JSON.stringify(echosWithTransformedLikes));
@@ -137,11 +142,17 @@ export async function fetchEchoById(id: string) {
                         ]
                     }
                 ]
-            }).lean().exec();
+            })
+            .populate({
+                path: 'likes.userId',
+                model: User,
+                select: 'id'
+            })
+            .lean().exec();
 
         // Transform likes for compatibility
         if (echo.likes) {
-            echo.likes = echo.likes.map((like: any) => like.userId ? like.userId.toString() : like);
+            echo.likes = echo.likes.map((like: any) => like.userId ? like.userId.id : like);
         }
 
         // Map riftId to rift

@@ -103,6 +103,11 @@ export async function fetchRiftPosts(id: string) {
                         select: "image _id name id",
                     },
                 },
+                {
+                    path: "likes.userId",
+                    model: User,
+                    select: "id",
+                },
             ],
         }).lean();
 
@@ -119,7 +124,7 @@ export async function fetchRiftPosts(id: string) {
                 ...echo.author,
                 _id: echo.author._id?.toString() || echo.author._id,
             } : null,
-            likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.toString() : like) : [],
+            likes: echo.likes ? echo.likes.map((like: any) => like.userId ? like.userId.id : like) : [],
             children: (echo.children || []).map((child: any) => ({
                 ...child,
                 _id: child._id?.toString() || child._id,
