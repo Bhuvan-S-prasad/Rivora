@@ -257,3 +257,22 @@ export async function toggleLikeEcho(echoId: string, userId: string, path: strin
         throw new Error(`Error toggling like: ${error.message}`);
     }
 }
+
+export async function deleteEcho(echoId: string, path: string) {
+    try {
+        connectToDB();
+
+        const echo = await Echo.findById(echoId);
+
+        if (!echo) {
+            throw new Error("Echo not found");
+        }
+
+        await echo.deleteOne();
+
+        revalidatePath(path);
+    } catch (error: any) {
+        console.error("Error deleting echo:", error);
+        throw new Error(`Error deleting echo: ${error.message}`);
+    }
+}

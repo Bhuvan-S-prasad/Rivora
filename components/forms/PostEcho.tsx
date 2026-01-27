@@ -37,6 +37,7 @@ function PostEcho({ userId, userImage, name, username }: Props) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { startUpload } = useUploadThing("media");
     const { organization } = useOrganization();
+    const [isPosting, setIsPosting] = useState(false);
 
     const form = useForm({
         resolver: zodResolver(echoValidation),
@@ -83,7 +84,8 @@ function PostEcho({ userId, userImage, name, username }: Props) {
     }
 
     const onSubmit = async (values: z.infer<typeof echoValidation>) => {
-        
+        setIsPosting(true);
+
         let uploadedImageUrls: string[] = [];
 
         if (files.length > 0) {
@@ -93,7 +95,7 @@ function PostEcho({ userId, userImage, name, username }: Props) {
             }
         }
 
-        
+
 
         await createEcho({
             text: values.echo,
@@ -103,6 +105,10 @@ function PostEcho({ userId, userImage, name, username }: Props) {
             path: pathname,
         });
 
+        form.reset();
+        setFiles([]);
+        setFileUrls([]);
+        setIsPosting(false);
         router.push("/");
     }
 
@@ -206,8 +212,10 @@ function PostEcho({ userId, userImage, name, username }: Props) {
 
                             <Button
                                 type="submit"
-                                className="bg-primary-500 rounded-full px-6 text-light-1 h-8 animate-in fade-in zoom-in duration-300">
-                                Post
+                                className="bg-primary-500 rounded-full px-6 text-light-1 h-8 animate-in fade-in zoom-in duration-300"
+                                disabled={isPosting}
+                            >
+                                {isPosting ? "Posting..." : "Post"}
                             </Button>
                         </div>
                     </div>

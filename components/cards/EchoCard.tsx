@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, MessageCircle, Send, Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { Heart, MessageCircle, Send, Copy, Check, MoreHorizontal, Trash2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 import { formatTimeAgo } from "@/lib/utils";
-import { toggleLikeEcho } from "@/lib/actions/echo.actions";
+import { toggleLikeEcho, deleteEcho } from "@/lib/actions/echo.actions";
 import {
     Dialog,
     DialogContent,
@@ -15,6 +15,7 @@ import {
     DialogTitle,
     DialogDescription,
     DialogTrigger,
+    DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,87 @@ interface Props {
     isCommented?: boolean;
     hideReplyList?: boolean;
 }
+
+const DeleteEcho = ({ id, pathname }: { id: string; pathname: string }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    return (
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <div className="relative" ref={menuRef}>
+                <div
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setIsMenuOpen(!isMenuOpen)
+                    }}
+                    className="cursor-pointer p-1 hover:bg-gray-100 rounded-full transition"
+                >
+                    <MoreHorizontal className="w-5 h-5 text-gray-400 hover:text-primary-500" />
+                </div>
+
+                {isMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10 animate-in fade-in zoom-in-95 duration-200">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsMenuOpen(false);
+                                setIsDeleteDialogOpen(true);
+                            }}
+                            className="w-full text-left px-4 py-2 text-small-regular text-red-500 hover:bg-red-50 flex items-center gap-2 rounded-md"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            <DialogContent className="bg-white">
+                <DialogHeader>
+                    <DialogTitle>Delete Echo?</DialogTitle>
+                    <DialogDescription>
+                        This action cannot be undone. This will permanently delete your echo.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <DialogFooter className="gap-2 sm:gap-0">
+                    <Button
+                        variant="secondary"
+                        className="bg-gray-100 hover:bg-gray-200 text-dark-1"
+                        onClick={() => setIsDeleteDialogOpen(false)}
+                    >
+                        Cancel
+                    </Button>
+
+                    <Button
+                        variant="destructive"
+                        onClick={async () => {
+                            await deleteEcho(id, pathname);
+                            setIsDeleteDialogOpen(false);
+                        }}
+                        className="bg-red-500 hover:bg-red-600 text-white"
+                    >
+                        Delete
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 const EchoCard = ({
     id,
@@ -210,81 +292,88 @@ const EchoCard = ({
                         )}
 
                         {/* Actions */}
-                        <div className="mt-5 flex items-center gap-6">
-                            <div
-                                onClick={handleLike}
-                                className="flex items-center gap-2 cursor-pointer group"
-                            >
-                                <Heart
-                                    className={`w-5 h-5 transition ${isLiked
-                                        ? "fill-red-500 text-red-500"
-                                        : "text-gray-1 group-hover:text-red-500"
-                                        }`}
-                                />
-                                {likes.length > 0 && (
-                                    <span
-                                        className={`text-subtle-medium ${isLiked ? "text-red-500" : "text-gray-1"
+                        <div className="mt-5 flex items-center justify-between">
+                            <div className="flex items-center gap-6">
+                                <div
+                                    onClick={handleLike}
+                                    className="flex items-center gap-2 cursor-pointer group"
+                                >
+                                    <Heart
+                                        className={`w-5 h-5 transition ${isLiked
+                                            ? "fill-red-500 text-red-500"
+                                            : "text-gray-1 group-hover:text-red-500"
                                             }`}
-                                    >
-                                        {likes.length}
-                                    </span>
-                                )}
-                            </div>
-
-                            <Link href={`/echo/${id}`}>
-                                <div className="flex items-center gap-2 cursor-pointer group">
-                                    <MessageCircle className="w-5 h-5 text-gray-1 group-hover:text-primary-500" />
-                                    {comments.length > 0 && (
-                                        <span className="text-subtle-medium text-gray-1 group-hover:text-primary-500">
-                                            {comments.length}
+                                    />
+                                    {likes.length > 0 && (
+                                        <span
+                                            className={`text-subtle-medium ${isLiked ? "text-red-500" : "text-gray-1"
+                                                }`}
+                                        >
+                                            {likes.length}
                                         </span>
                                     )}
                                 </div>
-                            </Link>
 
-                            <Dialog>
-                                <DialogTrigger asChild>
+                                <Link href={`/echo/${id}`}>
                                     <div className="flex items-center gap-2 cursor-pointer group">
-                                        <Send className="w-5 h-5 text-gray-1 group-hover:text-blue-500" />
+                                        <MessageCircle className="w-5 h-5 text-gray-1 group-hover:text-primary-500" />
+                                        {comments.length > 0 && (
+                                            <span className="text-subtle-medium text-gray-1 group-hover:text-primary-500">
+                                                {comments.length}
+                                            </span>
+                                        )}
                                     </div>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-md bg-white">
-                                    <DialogHeader>
-                                        <DialogTitle>Share Echo</DialogTitle>
-                                        <DialogDescription>
-                                            Share this echo with your friends or copy the link below.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="flex items-center space-x-2">
-                                        <div className="grid flex-1 gap-2">
-                                            <Label htmlFor="link" className="sr-only">
-                                                Link
-                                            </Label>
-                                            <Input
-                                                id="link"
-                                                defaultValue={shareUrl}
-                                                readOnly
-                                                className="bg-gray-50 border-gray-200 text-dark-1 focus-visible:ring-offset-0 focus-visible:ring-1 focus-visible:ring-primary-500"
-                                            />
-                                        </div>
-                                        <Button type="button" size="sm" className="px-3 bg-primary-500 hover:bg-primary-500/90 text-white" onClick={handleCopy}>
-                                            <span className="sr-only">Copy</span>
-                                            {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                                        </Button>
-                                    </div>
+                                </Link>
 
-                                    <div className="flex justify-end">
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            className="bg-gray-100 text-dark-1 hover:bg-gray-200"
-                                            onClick={handleCopy}
-                                        >
-                                            {isCopied ? "Copied" : "Copy Link"}
-                                        </Button>
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <div className="flex items-center gap-2 cursor-pointer group">
+                                            <Send className="w-5 h-5 text-gray-1 group-hover:text-blue-500" />
+                                        </div>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-md bg-white">
+                                        <DialogHeader>
+                                            <DialogTitle>Share Echo</DialogTitle>
+                                            <DialogDescription>
+                                                Share this echo with your friends or copy the link below.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="flex items-center space-x-2">
+                                            <div className="grid flex-1 gap-2">
+                                                <Label htmlFor="link" className="sr-only">
+                                                    Link
+                                                </Label>
+                                                <Input
+                                                    id="link"
+                                                    defaultValue={shareUrl}
+                                                    readOnly
+                                                    className="bg-gray-50 border-gray-200 text-dark-1 focus-visible:ring-offset-0 focus-visible:ring-1 focus-visible:ring-primary-500"
+                                                />
+                                            </div>
+                                            <Button type="button" size="sm" className="px-3 bg-primary-500 hover:bg-primary-500/90 text-white" onClick={handleCopy}>
+                                                <span className="sr-only">Copy</span>
+                                                {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                                            </Button>
+                                        </div>
+
+                                        <div className="flex justify-end">
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                className="bg-gray-100 text-dark-1 hover:bg-gray-200"
+                                                onClick={handleCopy}
+                                            >
+                                                {isCopied ? "Copied" : "Copy Link"}
+                                            </Button>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+
+                            {/* Delete Option */}
+                            {currentUserId === author.id && pathname === `/profile/${currentUserId}` && (
+                                <DeleteEcho id={id} pathname={pathname} />
+                            )}
                         </div>
                     </div>
                 </div>
