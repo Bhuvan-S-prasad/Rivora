@@ -15,9 +15,6 @@ Rivora is built on a robust, scalable architecture leveraging the latest web tec
 *   **Styling System**: **Tailwind CSS v4** combined with **Radix UI** primitives delivers a highly responsive, accessible, and theme-able interface.
 *   **File Storage**: **UploadThing** handles media assets, ensuring optimized image delivery for user profiles and content.
 
-### System Flow
-
-![System Flow](https://ik.imagekit.io/wq68aygdr/image.png)
 
 ### Data Flow
 1.  **Server Actions**: All mutations (creating Echoes, updating profiles) are handled via Next.js Server Actions in `lib/actions`, providing a secure direct-to-database communication channel without exposing API endpoints.
